@@ -1,0 +1,90 @@
+<Page x:Class="OpenRdpGuard.Views.Pages.ConnectionsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:vm="clr-namespace:OpenRdpGuard.ViewModels"
+      mc:Ignorable="d"
+      d:DataContext="{d:DesignInstance vm:ConnectionsViewModel, IsDesignTimeCreatable=True}">
+
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Style="{StaticResource CardBorderStyle}">
+            <Grid>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE774;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0" Foreground="{DynamicResource MutedTextBrush}" />
+                    <TextBlock Text="实时连接" Style="{StaticResource PageTitleTextStyle}" />
+                </StackPanel>
+                <Button Content="刷新" Width="80" HorizontalAlignment="Right" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding RefreshCommand}" />
+            </Grid>
+        </Border>
+
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Connections}" AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column"
+                  RowHeaderWidth="0" CanUserAddRows="False" Margin="0,4,0,0"
+                  BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1"
+                  Background="{DynamicResource CardBackgroundBrush}"
+                  Foreground="{DynamicResource PrimaryTextBrush}"
+                  GridLinesVisibility="Horizontal"
+                  HorizontalGridLinesBrush="{DynamicResource CardBorderBrush}">
+            <DataGrid.Resources>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+                    <Setter Property="BorderThickness" Value="0,0,0,1" />
+                    <Setter Property="FontWeight" Value="SemiBold" />
+                    <Setter Property="FontSize" Value="14" />
+                    <Setter Property="MinHeight" Value="32" />
+                </Style>
+                <Style TargetType="DataGridRow">
+                    <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                </Style>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                </Style>
+            </DataGrid.Resources>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="协议" Binding="{Binding Proto}" Width="80" FontSize="12" />
+                <DataGridTextColumn Header="本地地址" Binding="{Binding LocalAddress}" Width="170" FontSize="12" />
+                <DataGridTemplateColumn Header="远程地址" Width="170">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding RemoteAddress}" Foreground="{DynamicResource PrimaryTextBrush}" FontSize="12">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                                        <Setter Property="FontSize" Value="12" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsBlacklisted}" Value="True">
+                                                <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="状态" Binding="{Binding State}" Width="100" FontSize="12" />
+                <DataGridTextColumn Header="进程" Binding="{Binding ProcessName}" Width="120" FontSize="12" />
+                <DataGridTextColumn Header="PID" Binding="{Binding Pid}" Width="80" FontSize="12" />
+                <DataGridTemplateColumn Header="操作" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="断开" Background="#D66" Foreground="White"
+                                    Command="{Binding DataContext.KillConnectionCommand, RelativeSource={RelativeSource AncestorType=Page}}" 
+                                    CommandParameter="{Binding}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Page>
+

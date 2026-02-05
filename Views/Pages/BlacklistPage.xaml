@@ -1,0 +1,87 @@
+<Page x:Class="OpenRdpGuard.Views.Pages.BlacklistPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:vm="clr-namespace:OpenRdpGuard.ViewModels"
+      mc:Ignorable="d"
+      d:DataContext="{d:DesignInstance vm:BlacklistViewModel, IsDesignTimeCreatable=True}">
+
+    <ScrollViewer>
+        <StackPanel Margin="12">
+            <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel>
+                    <TextBlock Text="扫描最近指定时间的登录失败尝试，超过 3 次的 IP 将被封禁。"
+                               Foreground="{DynamicResource SecondaryTextBrush}" />
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        <TextBlock Text="扫描范围：" VerticalAlignment="Center" Margin="0,0,6,0"
+                                   Foreground="{DynamicResource SecondaryTextBrush}" />
+                        <ComboBox Width="90" ItemsSource="{Binding ScanOptions}" SelectedItem="{Binding SelectedScanHours}"
+                                  Background="{DynamicResource CardBackgroundBrush}"
+                                  Foreground="{DynamicResource PrimaryTextBrush}"
+                                  BorderBrush="{DynamicResource CardBorderBrush}" />
+                        <TextBlock Text="小时" VerticalAlignment="Center" Margin="6,0,0,0"
+                                   Foreground="{DynamicResource SecondaryTextBrush}" />
+                        <Button Content="开始扫描并封禁" Margin="12,0,0,0" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding ScanAndBlockCommand}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel>
+                    <TextBlock Text="已封禁 IP 列表" Style="{StaticResource SectionTitleTextStyle}" Margin="0,0,0,8" />
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <Button Content="刷新列表" Width="100" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding RefreshListCommand}" />
+                        <Button Content="解封选中 IP" Width="120" Margin="8,0,0,0" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding RemoveSelectedCommand}" />
+                        <Button Content="检查黑名单连接" Width="140" Margin="8,0,0,0" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding CheckBlacklistConnectionsCommand}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock Text="当前共有 " Foreground="{DynamicResource SecondaryTextBrush}" />
+                        <TextBlock Text="{Binding BlockedCount}" Foreground="{DynamicResource SuccessBrush}" FontWeight="SemiBold" />
+                        <TextBlock Text=" 个封禁 IP" Foreground="{DynamicResource SuccessBrush}" />
+                    </StackPanel>
+                    <Border BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="4"
+                            Background="{DynamicResource CardBackgroundBrush}">
+                        <ListBox ItemsSource="{Binding BlockedIps}" SelectedItem="{Binding SelectedBlockedIp}" Height="180" BorderThickness="0"
+                                 Background="{DynamicResource CardBackgroundBrush}"
+                                 Foreground="{DynamicResource PrimaryTextBrush}">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                                    <Setter Property="Background" Value="Transparent" />
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource ListItemHoverBrush}" />
+                                            <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource AccentBlueBrush}" />
+                                            <Setter Property="Foreground" Value="White" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                        </ListBox>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel>
+                    <TextBlock Text="手动封禁" Style="{StaticResource SectionTitleTextStyle}" Margin="0,0,0,8" />
+                    <TextBlock Text="支持单个 IP 或 IP 段 (CIDR)，例如：192.168.1.100 或 45.141.0.0/16 或 10.0.0.1-10.0.0.255" Style="{StaticResource MutedTextStyle}" Margin="0,0,0,8" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="输入IP/IP段：" VerticalAlignment="Center" Margin="0,0,6,0"
+                                   Foreground="{DynamicResource SecondaryTextBrush}" />
+                        <TextBox Width="260" Text="{Binding IpToAdd}"
+                                 Background="{DynamicResource CardBackgroundBrush}"
+                                 Foreground="{DynamicResource PrimaryTextBrush}"
+                                 BorderBrush="{DynamicResource CardBorderBrush}" />
+                        <Button Content="立即封禁" Margin="8,0,0,0" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding AddIpCommand}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Page>
+

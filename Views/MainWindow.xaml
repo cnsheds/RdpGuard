@@ -1,0 +1,330 @@
+<Window x:Class="OpenRdpGuard.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:OpenRdpGuard.ViewModels"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance vm:MainWindowViewModel, IsDesignTimeCreatable=True}"
+        Title="{Binding ApplicationTitle}"
+        Height="650" Width="1000"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource AppBackgroundBrush}"
+        WindowStyle="None"
+        ResizeMode="CanResize"
+        Icon="{DynamicResource ShieldDrawingIcon}">
+
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome CaptionHeight="36"
+                            CornerRadius="0"
+                            ResizeBorderThickness="6"
+                            GlassFrameThickness="0" />
+    </shell:WindowChrome.WindowChrome>
+
+    <Window.Resources>
+        <Style TargetType="ListBox" x:Key="NavListStyle">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="SelectionMode" Value="Single" />
+        </Style>
+
+        <Style TargetType="ListBoxItem" x:Key="NavItemStyle">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="230" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="36" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Title Bar -->
+        <Grid Grid.Row="0" Grid.ColumnSpan="2" Background="{DynamicResource TitleBarBackgroundBrush}" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{Binding ApplicationTitle}"
+                       Foreground="{DynamicResource TitleBarTextBrush}"
+                       VerticalAlignment="Center"
+                       Margin="12,0,0,0"
+                       FontSize="13" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button Style="{StaticResource TitleBarButtonStyle}"
+                        shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                        Click="MinimizeButton_Click">
+                    <TextBlock Text="&#xE921;" FontFamily="Segoe MDL2 Assets" />
+                </Button>
+                <Button Style="{StaticResource TitleBarButtonStyle}"
+                        shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                        Click="MaximizeButton_Click">
+                    <TextBlock Text="&#xE922;" FontFamily="Segoe MDL2 Assets" />
+                </Button>
+                <Button Style="{StaticResource TitleBarButtonStyle}"
+                        shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                        Click="CloseButton_Click">
+                    <TextBlock Text="&#xE8BB;" FontFamily="Segoe MDL2 Assets" />
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <Border Grid.Row="1" Background="{DynamicResource SidebarBackgroundBrush}">
+            <DockPanel>
+                <StackPanel Margin="16,16,16,8">
+                    <StackPanel Orientation="Horizontal" Margin="0,4,0,12">
+                        <Border Width="36" Height="36" Background="Transparent" Margin="0,0,8,0">
+                            <Viewbox>
+                                <Grid>
+                                    <Path Fill="{DynamicResource PrimaryTextBrush}"
+                                          Stretch="Uniform"
+                                          Data="M12,1 C16,2.5 19,3 22,4.2 L22,12.2 C22,18 17.3,22.2 12,24 C6.7,22.2 2,18 2,12.2 L2,4.2 C5,3 8,2.5 12,1 Z" />
+                                    <Path Stroke="{DynamicResource PrimaryTextBrush}"
+                                          StrokeThickness="0.7"
+                                          Fill="Transparent"
+                                          Stretch="Uniform"
+                                          Data="M12,4 C15,5.2 17.4,5.6 19.4,6.2 L19.4,12.2 C19.4,16.4 16.2,19.2 12,20.6 C7.8,19.2 4.6,16.4 4.6,12.2 L4.6,6.2 C6.6,5.6 9,5.2 12,4 Z" />
+                                </Grid>
+                            </Viewbox>
+                        </Border>
+                        <StackPanel>
+                            <TextBlock Text="RdpGuard" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" />
+                            <TextBlock Text="远程桌面安全防护" Style="{StaticResource MutedTextStyle}" />
+                        </StackPanel>
+                    </StackPanel>
+                    <TextBlock Text="功能" Style="{StaticResource MutedTextStyle}" />
+                    <ListBox x:Name="FunctionList" Style="{StaticResource NavListStyle}" ItemContainerStyle="{StaticResource NavItemStyle}"
+                         ItemsSource="{Binding FunctionItems}" SelectionChanged="FunctionList_SelectionChanged">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="12,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="20" />
+                                        <ColumnDefinition Width="22" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Ellipse x:Name="SelectDot" Width="12" Height="12" Stroke="{DynamicResource CardBorderBrush}" Fill="Transparent" VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="1" Text="{Binding IconGlyph}" FontFamily="Segoe MDL2 Assets" FontSize="{DynamicResource MenuFontSize}" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" />
+                                    <TextBlock x:Name="ItemText" Grid.Column="2" Text="{Binding Title}" FontSize="{DynamicResource MenuFontSize}" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" />
+                                </Grid>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}}" Value="True">
+                                        <Setter TargetName="SelectDot" Property="Fill" Value="{DynamicResource AccentBlueBrush}" />
+                                        <Setter TargetName="SelectDot" Property="Stroke" Value="{DynamicResource AccentBlueBrush}" />
+                                        <Setter TargetName="ItemText" Property="Foreground" Value="{DynamicResource AccentBlueBrush}" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+
+                <StackPanel Margin="16,12,16,8">
+                    <TextBlock Text="设置" Style="{StaticResource MutedTextStyle}" />
+                </StackPanel>
+
+                <ListBox x:Name="SettingsList" Style="{StaticResource NavListStyle}" ItemContainerStyle="{StaticResource NavItemStyle}"
+                         ItemsSource="{Binding SettingsItems}" SelectionChanged="SettingsList_SelectionChanged">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="12,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="20" />
+                                    <ColumnDefinition Width="22" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Ellipse x:Name="SelectDot" Width="12" Height="12" Stroke="{DynamicResource CardBorderBrush}" Fill="Transparent" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="{Binding IconGlyph}" FontFamily="Segoe MDL2 Assets" FontSize="{DynamicResource MenuFontSize}" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" />
+                                <TextBlock x:Name="ItemText" Grid.Column="2" Text="{Binding Title}" FontSize="{DynamicResource MenuFontSize}" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" />
+                            </Grid>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
+                                    <Setter TargetName="SelectDot" Property="Fill" Value="{DynamicResource AccentBlueBrush}" />
+                                    <Setter TargetName="SelectDot" Property="Stroke" Value="{DynamicResource AccentBlueBrush}" />
+                                    <Setter TargetName="ItemText" Property="Foreground" Value="{DynamicResource AccentBlueBrush}" />
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <TextBlock DockPanel.Dock="Bottom" Text="v1.0.0" Margin="16,8" FontSize="11" Foreground="{DynamicResource MutedTextBrush}" />
+            </DockPanel>
+        </Border>
+
+        <Frame x:Name="ContentFrame" Grid.Row="1" Grid.Column="1" Margin="12" NavigationUIVisibility="Hidden" Background="Transparent" />
+        <Border Grid.Row="1" Grid.Column="0" Background="{DynamicResource SidebarBackgroundBrush}">
+            <DockPanel>
+                <StackPanel Margin="16,16,16,8">
+                    <StackPanel Orientation="Horizontal" Margin="0,4,0,12">
+                        <Border Width="36" Height="36" Background="Transparent" Margin="0,0,8,0">
+                            <Viewbox>
+                                <Grid>
+                                    <Path Fill="{DynamicResource PrimaryTextBrush}"
+                                          Stretch="Uniform"
+                                          Data="M12,1 C16,2.5 19,3 22,4.2 L22,12.2 C22,18 17.3,22.2 12,24 C6.7,22.2 2,18 2,12.2 L2,4.2 C5,3 8,2.5 12,1 Z" />
+                                    <Path Stroke="{DynamicResource PrimaryTextBrush}"
+                                          StrokeThickness="0.7"
+                                          Fill="Transparent"
+                                          Stretch="Uniform"
+                                          Data="M12,4 C15,5.2 17.4,5.6 19.4,6.2 L19.4,12.2 C19.4,16.4 16.2,19.2 12,20.6 C7.8,19.2 4.6,16.4 4.6,12.2 L4.6,6.2 C6.6,5.6 9,5.2 12,4 Z" />
+                                </Grid>
+                            </Viewbox>
+                        </Border>
+                        <StackPanel>
+                            <TextBlock Text="RdpGuard" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" />
+                            <TextBlock Text="远程桌面安全防护" Style="{StaticResource MutedTextStyle}" />
+                        </StackPanel>
+                    </StackPanel>
+                    <TextBlock Text="功能" Style="{StaticResource MutedTextStyle}" />
+                    <ListBox x:Name="FunctionList1" Style="{StaticResource NavListStyle}" ItemContainerStyle="{StaticResource NavItemStyle}"
+                        ItemsSource="{Binding FunctionItems}" SelectionChanged="FunctionList_SelectionChanged">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="12,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="20" />
+                                        <ColumnDefinition Width="22" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Ellipse x:Name="SelectDot" Width="12" Height="12" Stroke="{DynamicResource CardBorderBrush}" Fill="Transparent" VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="1" Text="{Binding IconGlyph}" FontFamily="Segoe MDL2 Assets" FontSize="{DynamicResource MenuFontSize}" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" />
+                                    <TextBlock x:Name="ItemText" Grid.Column="2" Text="{Binding Title}" FontSize="{DynamicResource MenuFontSize}" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" />
+                                </Grid>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}}" Value="True">
+                                        <Setter TargetName="SelectDot" Property="Fill" Value="{DynamicResource AccentBlueBrush}" />
+                                        <Setter TargetName="SelectDot" Property="Stroke" Value="{DynamicResource AccentBlueBrush}" />
+                                        <Setter TargetName="ItemText" Property="Foreground" Value="{DynamicResource AccentBlueBrush}" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+
+                <StackPanel Margin="16,12,16,8">
+                    <TextBlock Text="设置" Style="{StaticResource MutedTextStyle}" />
+                </StackPanel>
+
+                <ListBox x:Name="SettingsList1" Style="{StaticResource NavListStyle}" ItemContainerStyle="{StaticResource NavItemStyle}"
+                    ItemsSource="{Binding SettingsItems}" SelectionChanged="SettingsList_SelectionChanged">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="12,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="20" />
+                                    <ColumnDefinition Width="22" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Ellipse x:Name="SelectDot" Width="12" Height="12" Stroke="{DynamicResource CardBorderBrush}" Fill="Transparent" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="{Binding IconGlyph}" FontFamily="Segoe MDL2 Assets" FontSize="{DynamicResource MenuFontSize}" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" />
+                                <TextBlock x:Name="ItemText" Grid.Column="2" Text="{Binding Title}" FontSize="{DynamicResource MenuFontSize}" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" />
+                            </Grid>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}}" Value="True">
+                                    <Setter TargetName="SelectDot" Property="Fill" Value="{DynamicResource AccentBlueBrush}" />
+                                    <Setter TargetName="SelectDot" Property="Stroke" Value="{DynamicResource AccentBlueBrush}" />
+                                    <Setter TargetName="ItemText" Property="Foreground" Value="{DynamicResource AccentBlueBrush}" />
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <TextBlock DockPanel.Dock="Bottom" Text="v1.0.0" Margin="16,8" FontSize="11" Foreground="{DynamicResource MutedTextBrush}" />
+            </DockPanel>
+        </Border>
+        <Border Grid.Row="1" Grid.Column="0" Background="{DynamicResource SidebarBackgroundBrush}">
+            <DockPanel>
+                <StackPanel Margin="16,16,16,8">
+                    <StackPanel Orientation="Horizontal" Margin="0,4,0,12">
+                        <Border Width="36" Height="36" Background="Transparent" Margin="0,0,8,0">
+                            <Viewbox>
+                                <Grid>
+                                    <Path Fill="{DynamicResource PrimaryTextBrush}"
+                                          Stretch="Uniform"
+                                          Data="M12,1 C16,2.5 19,3 22,4.2 L22,12.2 C22,18 17.3,22.2 12,24 C6.7,22.2 2,18 2,12.2 L2,4.2 C5,3 8,2.5 12,1 Z" />
+                                    <Path Stroke="{DynamicResource PrimaryTextBrush}"
+                                          StrokeThickness="0.7"
+                                          Fill="Transparent"
+                                          Stretch="Uniform"
+                                          Data="M12,4 C15,5.2 17.4,5.6 19.4,6.2 L19.4,12.2 C19.4,16.4 16.2,19.2 12,20.6 C7.8,19.2 4.6,16.4 4.6,12.2 L4.6,6.2 C6.6,5.6 9,5.2 12,4 Z" />
+                                </Grid>
+                            </Viewbox>
+                        </Border>
+                        <StackPanel>
+                            <TextBlock Text="RdpGuard" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" />
+                            <TextBlock Text="远程桌面安全防护" Style="{StaticResource MutedTextStyle}" />
+                        </StackPanel>
+                    </StackPanel>
+                    <TextBlock Text="功能" Style="{StaticResource MutedTextStyle}" />
+                    <ListBox x:Name="FunctionList2" Style="{StaticResource NavListStyle}" ItemContainerStyle="{StaticResource NavItemStyle}"
+                        ItemsSource="{Binding FunctionItems}" SelectionChanged="FunctionList_SelectionChanged">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="12,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="20" />
+                                        <ColumnDefinition Width="22" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Ellipse x:Name="SelectDot" Width="12" Height="12" Stroke="{DynamicResource CardBorderBrush}" Fill="Transparent" VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="1" Text="{Binding IconGlyph}" FontFamily="Segoe MDL2 Assets" FontSize="{DynamicResource MenuFontSize}" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" />
+                                    <TextBlock x:Name="ItemText" Grid.Column="2" Text="{Binding Title}" FontSize="{DynamicResource MenuFontSize}" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" />
+                                </Grid>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}}" Value="True">
+                                        <Setter TargetName="SelectDot" Property="Fill" Value="{DynamicResource AccentBlueBrush}" />
+                                        <Setter TargetName="SelectDot" Property="Stroke" Value="{DynamicResource AccentBlueBrush}" />
+                                        <Setter TargetName="ItemText" Property="Foreground" Value="{DynamicResource AccentBlueBrush}" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <TextBlock Text="设置" Style="{StaticResource MutedTextStyle}" RenderTransformOrigin="-4.833,11.193" />
+                    <ListBox x:Name="SettingsList2" Style="{StaticResource NavListStyle}" ItemContainerStyle="{StaticResource NavItemStyle}"
+                    ItemsSource="{Binding SettingsItems}" SelectionChanged="SettingsList_SelectionChanged">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="12,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="20" />
+                                        <ColumnDefinition Width="22" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Ellipse x:Name="SelectDot" Width="12" Height="12" Stroke="{DynamicResource CardBorderBrush}" Fill="Transparent" VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="1" Text="{Binding IconGlyph}" FontFamily="Segoe MDL2 Assets" FontSize="{DynamicResource MenuFontSize}" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" />
+                                    <TextBlock x:Name="ItemText" Grid.Column="2" Text="{Binding Title}" FontSize="{DynamicResource MenuFontSize}" Foreground="{DynamicResource SecondaryTextBrush}" VerticalAlignment="Center" />
+                                </Grid>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}}" Value="True">
+                                        <Setter TargetName="SelectDot" Property="Fill" Value="{DynamicResource AccentBlueBrush}" />
+                                        <Setter TargetName="SelectDot" Property="Stroke" Value="{DynamicResource AccentBlueBrush}" />
+                                        <Setter TargetName="ItemText" Property="Foreground" Value="{DynamicResource AccentBlueBrush}" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+
+                <StackPanel Margin="16,12,16,8"/>
+
+                <TextBlock DockPanel.Dock="Bottom" Text="v1.0.0" Margin="16,8" FontSize="11" Foreground="{DynamicResource MutedTextBrush}" />
+            </DockPanel>
+        </Border>
+    </Grid>
+</Window>
+
+

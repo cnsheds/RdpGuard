@@ -1,0 +1,51 @@
+<Page x:Class="OpenRdpGuard.Views.Pages.PortConfigPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:vm="clr-namespace:OpenRdpGuard.ViewModels"
+      mc:Ignorable="d"
+      d:DataContext="{d:DesignInstance vm:PortConfigViewModel, IsDesignTimeCreatable=True}">
+
+    <ScrollViewer>
+        <StackPanel Margin="12">
+            <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel>
+                    <TextBlock Text="端口配置" Style="{StaticResource PageTitleTextStyle}" Margin="0,0,0,8" />
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock Text="当前 RDP 端口: " Foreground="{DynamicResource SecondaryTextBrush}" />
+                        <TextBlock Text="{Binding CurrentPort}" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" />
+                    </StackPanel>
+                    <TextBlock Text="修改端口后将自动重启远程桌面服务使其生效" Style="{StaticResource MutedTextStyle}" Margin="0,0,0,12" />
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock Text="新端口:" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="{DynamicResource SecondaryTextBrush}" />
+                        <TextBox Width="120" Text="{Binding NewPort}"
+                                 Background="{DynamicResource CardBackgroundBrush}"
+                                 Foreground="{DynamicResource PrimaryTextBrush}"
+                                 BorderBrush="{DynamicResource CardBorderBrush}" />
+                        <TextBlock Text="(范围: 1024-65535)" Style="{StaticResource MutedTextStyle}" VerticalAlignment="Center" Margin="8,0,0,0" />
+                    </StackPanel>
+
+                    <CheckBox Content="修改后自动重启服务 (推荐)" IsChecked="{Binding RestartService}" Margin="0,4,0,8"
+                              Foreground="{DynamicResource SecondaryTextBrush}" />
+
+                    <Button Content="应用端口更改" Width="140" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding ApplyPortCommand}" />
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel>
+                    <TextBlock Text="注意事项" Style="{StaticResource SectionTitleTextStyle}" Margin="0,0,0,8" />
+                    <TextBlock Text="• 重启服务会立即断开所有远程连接" Foreground="{DynamicResource WarningBrush}" Margin="0,0,0,4"
+                               FontSize="{DynamicResource DescriptionFontSize}" />
+                    <TextBlock Text="• 如果您正在远程操作，请确保有其他方式访问服务器" Foreground="{DynamicResource WarningBrush}" Margin="0,0,0,4"
+                               FontSize="{DynamicResource DescriptionFontSize}" />
+                    <TextBlock Text="• 修改后请使用 服务器IP:新端口 进行连接" Foreground="{DynamicResource WarningBrush}"
+                               FontSize="{DynamicResource DescriptionFontSize}" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Page>
+
