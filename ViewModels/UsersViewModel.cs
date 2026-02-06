@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using OpenRdpGuard.Views.Dialogs;
 using System.Collections.Generic;
@@ -26,11 +26,11 @@ namespace OpenRdpGuard.ViewModels
 
         public UsersViewModel()
         {
-            Refresh();
+            RefreshCommand.Execute(null);
         }
 
         [RelayCommand]
-        private async void Refresh()
+        private async Task Refresh()
         {
             try
             {
@@ -68,7 +68,9 @@ namespace OpenRdpGuard.ViewModels
             }
             catch (System.Exception ex)
             {
-                MessageBox.Show($"读取用户列表失败：{ex.Message}", "错误");
+                var dialog = new ConfirmDialog("错误", $"读取用户列表失败：{ex.Message}", showCancel: false);
+                dialog.Owner = Application.Current?.MainWindow;
+                dialog.ShowDialog();
             }
         }
 
@@ -106,11 +108,15 @@ namespace OpenRdpGuard.ViewModels
 
                 if (!success)
                 {
-                    MessageBox.Show("密码修改失败，请确认以管理员身份运行。", "错误");
+                    var msgdialog = new ConfirmDialog("错误", "密码修改失败，请确认以管理员身份运行。", showCancel: false);
+                    msgdialog.Owner = Application.Current?.MainWindow;
+                    msgdialog.ShowDialog();
                 }
                 else
                 {
-                    MessageBox.Show("密码已更新。", "完成");
+                    var msgdialog = new ConfirmDialog("完成", "密码已更新。", showCancel: false);
+                    msgdialog.Owner = Application.Current?.MainWindow;
+                    msgdialog.ShowDialog();
                 }
             }
         }

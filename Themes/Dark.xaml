@@ -10,6 +10,7 @@
     <SolidColorBrush x:Key="WarningBrush" Color="#F0B35A" />
     <SolidColorBrush x:Key="MutedTextBrush" Color="#A9A9A9" />
     <SolidColorBrush x:Key="PrimaryTextBrush" Color="#F2F2F2" />
+    <SolidColorBrush x:Key="InversePrimaryTextBrush" Color="#000000" />
     <SolidColorBrush x:Key="SecondaryTextBrush" Color="#D6D6D6" />
     <SolidColorBrush x:Key="ButtonBackgroundBrush" Color="#555555" />
     <SolidColorBrush x:Key="ButtonBorderBrush" Color="#5A5A5A" />

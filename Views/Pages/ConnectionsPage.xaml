@@ -19,7 +19,12 @@
                     <TextBlock Text="&#xE774;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0" Foreground="{DynamicResource MutedTextBrush}" />
                     <TextBlock Text="实时连接" Style="{StaticResource PageTitleTextStyle}" />
                 </StackPanel>
-                <Button Content="刷新" Width="80" HorizontalAlignment="Right" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding RefreshCommand}" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <CheckBox Content="仅显示RDP连接" Margin="0,0,12,0" VerticalAlignment="Center"
+                              IsChecked="{Binding OnlyRdpConnections}"
+                              Foreground="{DynamicResource SecondaryTextBrush}" />
+                    <Button Content="刷新" Width="80" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding RefreshCommand}" />
+                </StackPanel>
             </Grid>
         </Border>
 
@@ -55,7 +60,7 @@
                 <DataGridTemplateColumn Header="远程地址" Width="170">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding RemoteAddress}" Foreground="{DynamicResource PrimaryTextBrush}" FontSize="12">
+                            <TextBlock Text="{Binding RemoteAddress}" Foreground="{DynamicResource PrimaryTextBrush}" FontSize="12" VerticalAlignment="Center">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />

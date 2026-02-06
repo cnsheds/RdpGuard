@@ -1,5 +1,5 @@
 using Microsoft.Win32;
-using System.Diagnostics;
+using OpenRdpGuard.Helpers;
 using System.Threading.Tasks;
 
 namespace OpenRdpGuard.Services
@@ -14,8 +14,9 @@ namespace OpenRdpGuard.Services
     {
         private const string RdpKeyPath = @"SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp";
         private const string PortValueName = "PortNumber";
-        private const string AllowRuleName = "OpenRdpGuard-RDP-Allow";
-        private const string AllowRuleNameUdp = "OpenRdpGuard-RDP-Allow-UDP";
+        private const string AllowRuleName = FirewallRuleNames.AllowRule;
+        private const string AllowRuleNameUdp = FirewallRuleNames.AllowRuleUdp;
+        private readonly FirewallComManager _comManager = new FirewallComManager(FirewallRuleNames.BlockRule, AllowRuleName, AllowRuleNameUdp);
 
         public int GetRdpPort()
         {
@@ -52,32 +53,9 @@ namespace OpenRdpGuard.Services
 
         private void UpdateFirewallRules(int oldPort, int newPort)
         {
-            RunNetsh($"advfirewall firewall delete rule name=\"{AllowRuleName}\"");
-            RunNetsh($"advfirewall firewall delete rule name=\"{AllowRuleNameUdp}\"");
-
-            RunNetsh($"advfirewall firewall add rule name=\"{AllowRuleName}\" dir=in action=allow protocol=TCP localport={newPort}");
-            RunNetsh($"advfirewall firewall add rule name=\"{AllowRuleNameUdp}\" dir=in action=allow protocol=UDP localport={newPort}");
-
-            if (oldPort != newPort)
-            {
-                RunNetsh($"advfirewall firewall add rule name=\"OpenRdpGuard-Block-OldPort-{oldPort}\" dir=in action=block protocol=TCP localport={oldPort}");
-                RunNetsh($"advfirewall firewall add rule name=\"OpenRdpGuard-Block-OldPort-UDP-{oldPort}\" dir=in action=block protocol=UDP localport={oldPort}");
-            }
-        }
-
-        private void RunNetsh(string args)
-        {
-            try
-            {
-                var psi = new ProcessStartInfo("netsh", args)
-                {
-                    CreateNoWindow = true,
-                    UseShellExecute = false,
-                    Verb = "runas"
-                };
-                Process.Start(psi)?.WaitForExit();
-            }
-            catch { }
+            _comManager.DeleteAllowRules();
+            _comManager.UpsertAllowRule(AllowRuleName, FirewallComManager.ProtocolTcp, newPort, "Any", true);
+            _comManager.UpsertAllowRule(AllowRuleNameUdp, FirewallComManager.ProtocolUdp, newPort, "Any", true);
         }
     }
 }

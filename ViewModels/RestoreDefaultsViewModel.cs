@@ -31,6 +31,7 @@ namespace OpenRdpGuard.ViewModels
             if (confirmDialog.ShowDialog() != true) return;
 
             await _settingsService.SetRdpPortAsync(3389);
+            await _whitelistService.ApplyWhitelistRulesAsync();
             await _systemService.RestartRdpServiceAsync();
 
             var allowed = await _whitelistService.GetAllowedIpsAsync();

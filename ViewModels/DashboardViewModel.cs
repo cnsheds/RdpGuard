@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using OpenRdpGuard.Services;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using MediaBrushes = System.Windows.Media.Brushes;
 
 namespace OpenRdpGuard.ViewModels
 {
@@ -21,7 +22,7 @@ namespace OpenRdpGuard.ViewModels
         private string _firewallStatusText = "未管理";
 
         [ObservableProperty]
-        private Brush _firewallStatusBrush = Brushes.Gray;
+        private System.Windows.Media.Brush _firewallStatusBrush = MediaBrushes.Gray;
 
         [ObservableProperty]
         private string _whitelistStatusText = "Any";
@@ -36,13 +37,13 @@ namespace OpenRdpGuard.ViewModels
         private string _rdpServiceStatusText = "未知";
 
         [ObservableProperty]
-        private Brush _rdpServiceStatusBrush = Brushes.Gray;
+        private System.Windows.Media.Brush _rdpServiceStatusBrush = MediaBrushes.Gray;
 
         [ObservableProperty]
         private string _firewallServiceStatusText = "未知";
 
         [ObservableProperty]
-        private Brush _firewallServiceStatusBrush = Brushes.Gray;
+        private System.Windows.Media.Brush _firewallServiceStatusBrush = MediaBrushes.Gray;
 
         public DashboardViewModel(ISettingsService settingsService,
             IFirewallService firewallService,
@@ -65,22 +66,23 @@ namespace OpenRdpGuard.ViewModels
 
             var isManaged = _firewallService.IsManaged();
             FirewallStatusText = isManaged ? "已由 RdpGuard 管理" : "未管理";
-            FirewallStatusBrush = isManaged ? Brushes.Green : Brushes.Gray;
+            FirewallStatusBrush = isManaged ? MediaBrushes.Green : MediaBrushes.Gray;
 
             var rdpRunning = _systemService.IsRdpServiceRunning();
             RdpServiceStatusText = rdpRunning ? "运行中" : "已停止";
-            RdpServiceStatusBrush = rdpRunning ? Brushes.Green : Brushes.Red;
+            RdpServiceStatusBrush = rdpRunning ? MediaBrushes.Green : MediaBrushes.Red;
 
             var fwRunning = _systemService.IsFirewallServiceRunning();
             FirewallServiceStatusText = fwRunning ? "运行中" : "已停止";
-            FirewallServiceStatusBrush = fwRunning ? Brushes.Green : Brushes.Red;
+            FirewallServiceStatusBrush = fwRunning ? MediaBrushes.Green : MediaBrushes.Red;
 
             WhitelistStatusText = _whitelistService.IsWhitelistEnabled() ? "仅白名单" : "Any";
 
             try
             {
                 var connections = await _connectionService.GetActiveConnectionsAsync();
-                ConnectionCount = connections.Count;
+                var suffix = ":" + RdpPort;
+                ConnectionCount = connections.Count(c => c.LocalAddress.EndsWith(suffix) || c.RemoteAddress.EndsWith(suffix));
             }
             catch
             {

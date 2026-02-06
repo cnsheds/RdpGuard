@@ -25,8 +25,29 @@
                         <Button Content="添加" Margin="8,0,0,0" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding AddIpCommand}" />
                     </StackPanel>
 
-                    <Border BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="4">
-                        <ListBox ItemsSource="{Binding AllowedIps}" BorderThickness="0">
+                    <Border BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="1" CornerRadius="4"
+                            Background="{DynamicResource CardBackgroundBrush}">
+                        <ListBox ItemsSource="{Binding AllowedIps}" BorderThickness="0"
+                                 Background="{DynamicResource CardBackgroundBrush}"
+                                 Foreground="{DynamicResource PrimaryTextBrush}">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="Padding" Value="6,2" />
+                                <Setter Property="MinHeight" Value="24" />
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource ListItemHoverBrush}" />
+                                        <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource AccentBlueBrush}" />
+                                        <Setter Property="Foreground" Value="White" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid>
@@ -34,8 +55,8 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="&#xE8F1;" FontFamily="Segoe MDL2 Assets" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,8,0" />
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="&#xE8F1;" FontFamily="Segoe MDL2 Assets" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,8,0" VerticalAlignment="Center" />
                                         <TextBlock Text="{Binding}" VerticalAlignment="Center" />
                                     </StackPanel>
                                     <Button Grid.Column="1" Content="移除" Margin="8,0,0,0" Style="{StaticResource PrimaryButtonStyle}"

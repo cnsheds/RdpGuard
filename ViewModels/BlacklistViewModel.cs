@@ -1,11 +1,13 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using OpenRdpGuard.Services;
+using OpenRdpGuard.Views.Dialogs;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace OpenRdpGuard.ViewModels
 {
@@ -14,6 +16,8 @@ namespace OpenRdpGuard.ViewModels
         private readonly IFirewallService _firewallService;
         private readonly ILogService _logService;
         private readonly IConnectionService _connectionService;
+        private readonly DispatcherTimer _monitorTimer;
+        private bool _isScanRunning;
 
         [ObservableProperty]
         private ObservableCollection<string> _blockedIps = new();
@@ -33,11 +37,20 @@ namespace OpenRdpGuard.ViewModels
         [ObservableProperty]
         private int _blockedCount;
 
+        [ObservableProperty]
+        private bool _isMonitoring;
+
+        [ObservableProperty]
+        private int _monitorIntervalMinutes = 10;
+
         public BlacklistViewModel(IFirewallService firewallService, ILogService logService, IConnectionService connectionService)
         {
             _firewallService = firewallService;
             _logService = logService;
             _connectionService = connectionService;
+            _monitorTimer = new DispatcherTimer();
+            _monitorTimer.Tick += OnMonitorTimerTick;
+            UpdateMonitorInterval();
             _ = RefreshList();
         }
 
@@ -56,7 +69,9 @@ namespace OpenRdpGuard.ViewModels
 
             if (_firewallService.IsLocalIp(IpToAdd))
             {
-                MessageBox.Show("为了防止误封，本机 IP 不允许加入黑名单。", "提示");
+                var dialog = new ConfirmDialog("提示", "为了防止误封，本机 IP 不允许加入黑名单。", showCancel: false);
+                dialog.Owner = Application.Current?.MainWindow;
+                dialog.ShowDialog();
                 return;
             }
 
@@ -80,10 +95,15 @@ namespace OpenRdpGuard.ViewModels
         [RelayCommand]
         private async Task ScanAndBlock()
         {
+            if (_isScanRunning) return;
+            _isScanRunning = true;
             var attempts = await _logService.GetLoginAttemptsAsync(TimeSpan.FromHours(SelectedScanHours));
             if (!string.IsNullOrWhiteSpace(_logService.LastError))
             {
-                MessageBox.Show("未以管理员运行，将无法读取 Security 日志中的失败登录记录。", "提示");
+                _isScanRunning = false;
+                var dialog = new ConfirmDialog("提示", "未以管理员运行，将无法读取 Security 日志中的失败登录记录。", showCancel: false);
+                dialog.Owner = Application.Current?.MainWindow;
+                dialog.ShowDialog();
                 return;
             }
             var offenders = attempts.Where(a => !a.IsSuccess)
@@ -100,6 +120,7 @@ namespace OpenRdpGuard.ViewModels
             }
 
             await RefreshList();
+            _isScanRunning = false;
         }
 
         [RelayCommand]
@@ -107,6 +128,42 @@ namespace OpenRdpGuard.ViewModels
         {
             var ips = await _firewallService.GetBlockedIpsAsync();
             await _connectionService.KillConnectionsByRemoteIpAsync(ips);
+        }
+
+        partial void OnIsMonitoringChanged(bool value)
+        {
+            if (value)
+            {
+                UpdateMonitorInterval();
+                _monitorTimer.Start();
+            }
+            else
+            {
+                _monitorTimer.Stop();
+            }
+        }
+
+        partial void OnMonitorIntervalMinutesChanged(int value)
+        {
+            if (value < 1)
+            {
+                MonitorIntervalMinutes = 1;
+                return;
+            }
+
+            UpdateMonitorInterval();
+        }
+
+        private void UpdateMonitorInterval()
+        {
+            var minutes = Math.Max(1, MonitorIntervalMinutes);
+            _monitorTimer.Interval = TimeSpan.FromMinutes(minutes);
+        }
+
+        private async void OnMonitorTimerTick(object? sender, EventArgs e)
+        {
+            if (_isScanRunning) return;
+            await ScanAndBlock();
         }
     }
 }

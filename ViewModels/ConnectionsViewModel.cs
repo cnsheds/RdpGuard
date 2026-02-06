@@ -11,14 +11,19 @@ namespace OpenRdpGuard.ViewModels
     {
         private readonly IConnectionService _connectionService;
         private readonly IFirewallService _firewallService;
+        private readonly ISettingsService _settingsService;
 
         [ObservableProperty]
         private ObservableCollection<ConnectionInfo> _connections = new();
 
-        public ConnectionsViewModel(IConnectionService connectionService, IFirewallService firewallService)
+        [ObservableProperty]
+        private bool _onlyRdpConnections = true;
+
+        public ConnectionsViewModel(IConnectionService connectionService, IFirewallService firewallService, ISettingsService settingsService)
         {
             _connectionService = connectionService;
             _firewallService = firewallService;
+            _settingsService = settingsService;
             _ = Refresh();
         }
 
@@ -28,6 +33,7 @@ namespace OpenRdpGuard.ViewModels
             var data = await _connectionService.GetActiveConnectionsAsync();
             var blocked = await _firewallService.GetBlockedIpsAsync();
             var blockedSet = blocked.ToHashSet();
+            var rdpPort = _settingsService.GetRdpPort();
 
             foreach (var conn in data)
             {
@@ -35,7 +41,11 @@ namespace OpenRdpGuard.ViewModels
                 conn.IsBlacklisted = blockedSet.Contains(remote);
             }
 
-            Connections = new ObservableCollection<ConnectionInfo>(data);
+            var filtered = OnlyRdpConnections
+                ? data.Where(c => IsRdpConnection(c, rdpPort))
+                : data;
+
+            Connections = new ObservableCollection<ConnectionInfo>(filtered);
         }
 
         [RelayCommand]
@@ -46,6 +56,18 @@ namespace OpenRdpGuard.ViewModels
                 await _connectionService.KillConnectionAsync(conn.Pid);
                 await Refresh();
             }
+        }
+
+        partial void OnOnlyRdpConnectionsChanged(bool value)
+        {
+            _ = Refresh();
+        }
+
+        private static bool IsRdpConnection(ConnectionInfo conn, int rdpPort)
+        {
+            if (rdpPort <= 0) return false;
+            var suffix = ":" + rdpPort;
+            return conn.LocalAddress.EndsWith(suffix) || conn.RemoteAddress.EndsWith(suffix);
         }
     }
 }

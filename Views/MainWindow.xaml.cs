@@ -3,6 +3,7 @@ using OpenRdpGuard.ViewModels;
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using WpfListBox = System.Windows.Controls.ListBox;
 using System.Windows.Input;
 
 namespace OpenRdpGuard.Views
@@ -18,11 +19,21 @@ namespace OpenRdpGuard.Views
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            // Select the first available navigation item on whichever list is visible.
-            var list = GetFirstNonEmptyList(FunctionList, FunctionList1, FunctionList2);
-            if (list != null && list.Items.Count > 0)
+            // Ensure all function lists show the same initial selection.
+            var lists = new[] { FunctionList };
+            NavigationItem? firstItem = null;
+            foreach (var list in lists)
             {
-                list.SelectedIndex = 0;
+                if (list != null && list.Items.Count > 0)
+                {
+                    list.SelectedIndex = 0;
+                    firstItem ??= list.SelectedItem as NavigationItem;
+                }
+            }
+
+            if (firstItem != null)
+            {
+                NavigateTo(firstItem.PageType);
             }
         }
 
@@ -30,7 +41,7 @@ namespace OpenRdpGuard.Views
         {
             if (sender is ListBox list && list.SelectedItem is NavigationItem item)
             {
-                ClearOtherLists(list, SettingsList, SettingsList1, SettingsList2);
+                ClearOtherLists(list, SettingsList);
                 NavigateTo(item.PageType);
             }
         }
@@ -39,21 +50,21 @@ namespace OpenRdpGuard.Views
         {
             if (sender is ListBox list && list.SelectedItem is NavigationItem item)
             {
-                ClearOtherLists(list, FunctionList, FunctionList1, FunctionList2);
+                ClearOtherLists(list, FunctionList);
                 NavigateTo(item.PageType);
             }
         }
 
         private void NavigateTo(Type pageType)
         {
-            var page = (Page)App.Services.GetService(pageType);
+            var page = App.Services.GetService(pageType) as Page;
             if (page != null)
             {
                 ContentFrame.Navigate(page);
             }
         }
 
-        private static ListBox? GetFirstNonEmptyList(params ListBox?[] lists)
+        private static WpfListBox? GetFirstNonEmptyList(params WpfListBox?[] lists)
         {
             foreach (var list in lists)
             {
@@ -65,7 +76,7 @@ namespace OpenRdpGuard.Views
             return null;
         }
 
-        private static void ClearOtherLists(ListBox active, params ListBox?[] lists)
+        private static void ClearOtherLists(WpfListBox active, params WpfListBox?[] lists)
         {
             foreach (var list in lists)
             {

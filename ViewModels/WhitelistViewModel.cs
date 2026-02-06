@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using OpenRdpGuard.Services;
+using OpenRdpGuard.Views.Dialogs;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows;
@@ -59,7 +60,9 @@ namespace OpenRdpGuard.ViewModels
         {
             if (IsWhitelistEnabled && AllowedIps.Count == 0)
             {
-                MessageBox.Show("白名单为空，无法启用。请先添加 IP。", "提示");
+                var dialog = new ConfirmDialog("提示", "白名单为空，无法启用。请先添加 IP。", showCancel: false);
+                dialog.Owner = Application.Current?.MainWindow;
+                dialog.ShowDialog();
                 IsWhitelistEnabled = false;
                 return;
             }

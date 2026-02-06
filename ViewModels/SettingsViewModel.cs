@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using OpenRdpGuard.Services;
+using OpenRdpGuard.Views.Dialogs;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -35,11 +36,15 @@ namespace OpenRdpGuard.ViewModels
             if (RdpPort > 0 && RdpPort < 65536)
             {
                 await _settingsService.SetRdpPortAsync(RdpPort);
-                MessageBox.Show($"RDP Port changed to {RdpPort}. You may need to restart the RDP service.", "Success");
+                var dialog = new ConfirmDialog("完成", $"RDP Port changed to {RdpPort}. You may need to restart the RDP service.", showCancel: false);
+                dialog.Owner = Application.Current?.MainWindow;
+                dialog.ShowDialog();
             }
             else
             {
-                MessageBox.Show("Invalid Port Number", "Error");
+                var dialog = new ConfirmDialog("错误", "Invalid Port Number", showCancel: false);
+                dialog.Owner = Application.Current?.MainWindow;
+                dialog.ShowDialog();
             }
         }
 
@@ -47,7 +52,9 @@ namespace OpenRdpGuard.ViewModels
         private async Task RestartRdp()
         {
             await _systemService.RestartRdpServiceAsync();
-            MessageBox.Show("RDP Service Restarted", "Info");
+            var dialog = new ConfirmDialog("提示", "RDP Service Restarted", showCancel: false);
+            dialog.Owner = Application.Current?.MainWindow;
+            dialog.ShowDialog();
         }
     }
 }

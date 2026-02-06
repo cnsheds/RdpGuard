@@ -8,9 +8,9 @@ namespace OpenRdpGuard.Views.Pages
         public WhitelistViewModel ViewModel { get; }
         public WhitelistPage(WhitelistViewModel viewModel)
         {
-            ViewModel = viewModel;
-            DataContext = this;
             InitializeComponent();
+            ViewModel = viewModel;
+            DataContext = viewModel;
         }
     }
 }

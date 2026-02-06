@@ -1,9 +1,7 @@
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
+using OpenRdpGuard.Helpers;
 
 namespace OpenRdpGuard.Services
 {
@@ -19,41 +17,19 @@ namespace OpenRdpGuard.Services
 
     public class WhitelistService : IWhitelistService
     {
-        private const string ConfigFile = "allowed_ips.json";
-        private const string RuleAllowName = "OpenRdpGuardWhitelistAllow";
-        private const string RuleAllowNameUdp = "OpenRdpGuardWhitelistAllowUdp";
+        private const string RuleAllowName = FirewallRuleNames.AllowRule;
+        private const string RuleAllowNameUdp = FirewallRuleNames.AllowRuleUdp;
         private List<string> _allowedIps = new();
         private readonly ISettingsService _settingsService;
         private readonly IAppSettingsService _appSettings;
+        private readonly FirewallComManager _comManager;
 
         public WhitelistService(ISettingsService settingsService, IAppSettingsService appSettings)
         {
             _settingsService = settingsService;
             _appSettings = appSettings;
-            LoadConfig();
-        }
-
-        private void LoadConfig()
-        {
-            if (File.Exists(ConfigFile))
-            {
-                try
-                {
-                    var json = File.ReadAllText(ConfigFile);
-                    _allowedIps = JsonSerializer.Deserialize<List<string>>(json) ?? new List<string>();
-                }
-                catch { }
-            }
-        }
-
-        private void SaveConfig()
-        {
-            try
-            {
-                var json = JsonSerializer.Serialize(_allowedIps, new JsonSerializerOptions { WriteIndented = true });
-                File.WriteAllText(ConfigFile, json);
-            }
-            catch { }
+            _comManager = new FirewallComManager(FirewallRuleNames.BlockRule, RuleAllowName, RuleAllowNameUdp);
+            _allowedIps = _comManager.GetRemoteAddressesFromTcpAllowRule();
         }
 
         public async Task AllowIpAsync(string ip)
@@ -61,7 +37,6 @@ namespace OpenRdpGuard.Services
             if (!string.IsNullOrWhiteSpace(ip) && !_allowedIps.Contains(ip))
             {
                 _allowedIps.Add(ip);
-                SaveConfig();
             }
             await ApplyWhitelistRulesAsync();
         }
@@ -71,19 +46,42 @@ namespace OpenRdpGuard.Services
             if (!string.IsNullOrWhiteSpace(ip) && _allowedIps.Contains(ip))
             {
                 _allowedIps.Remove(ip);
-                SaveConfig();
             }
             await ApplyWhitelistRulesAsync();
         }
 
         public Task<List<string>> GetAllowedIpsAsync()
         {
-            return Task.FromResult(_allowedIps.ToList());
+            return Task.Run(() =>
+            {
+                try
+                {
+                    _allowedIps = _comManager.GetRemoteAddressesFromTcpAllowRule();
+                    return _allowedIps.ToList();
+                }
+                catch
+                {
+                    return new List<string>();
+                }
+            });
         }
 
         public bool IsWhitelistEnabled()
         {
-            return _appSettings.GetWhitelistEnabled();
+            var settingsEnabled = _appSettings.GetWhitelistEnabled();
+            if (!settingsEnabled)
+            {
+                return false;
+            }
+
+            try
+            {
+                return _comManager.AreAllowRulesEnabled();
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public async Task SetWhitelistEnabledAsync(bool enabled)
@@ -100,41 +98,20 @@ namespace OpenRdpGuard.Services
                 var port = _settingsService.GetRdpPort();
                 var ipList = string.Join(",", _allowedIps);
 
-                RunNetsh($"advfirewall firewall delete rule name=\"{RuleAllowName}\"");
-                RunNetsh($"advfirewall firewall delete rule name=\"{RuleAllowNameUdp}\"");
-
                 if (!enabled || _allowedIps.Count == 0)
                 {
-                    RunNetsh("advfirewall firewall set rule group=\"remote desktop\" new enable=yes");
+                    _comManager.SetRemoteDesktopRulesEnabled(true);
+                    _comManager.UpsertAllowRule(RuleAllowName, FirewallComManager.ProtocolTcp, port, "Any", true);
+                    _comManager.UpsertAllowRule(RuleAllowNameUdp, FirewallComManager.ProtocolUdp, port, "Any", true);
+                    _comManager.SetAllowRulesEnabled(true);
                     return;
                 }
 
-                RunNetsh("advfirewall firewall set rule group=\"remote desktop\" new enable=no");
-                RunNetsh($"advfirewall firewall add rule name=\"{RuleAllowName}\" dir=in action=allow protocol=TCP localport={port} remoteip=\"{ipList}\"");
-                RunNetsh($"advfirewall firewall add rule name=\"{RuleAllowNameUdp}\" dir=in action=allow protocol=UDP localport={port} remoteip=\"{ipList}\"");
+                _comManager.SetRemoteDesktopRulesEnabled(false);
+                _comManager.UpsertAllowRule(RuleAllowName, FirewallComManager.ProtocolTcp, port, ipList, true);
+                _comManager.UpsertAllowRule(RuleAllowNameUdp, FirewallComManager.ProtocolUdp, port, ipList, true);
+                _comManager.SetAllowRulesEnabled(true);
             });
-        }
-
-        private (int ExitCode, string Output) RunNetsh(string args)
-        {
-            try
-            {
-                var psi = new ProcessStartInfo("netsh", args)
-                {
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    Verb = "runas"
-                };
-                var p = Process.Start(psi);
-                p.WaitForExit();
-                return (p.ExitCode, p.StandardOutput.ReadToEnd());
-            }
-            catch
-            {
-                return (-1, string.Empty);
-            }
         }
     }
 }
