@@ -16,6 +16,7 @@ namespace OpenRdpGuard.ViewModels
         private readonly IFirewallService _firewallService;
         private readonly ILogService _logService;
         private readonly IConnectionService _connectionService;
+        private readonly IAppSettingsService _appSettingsService;
         private readonly DispatcherTimer _monitorTimer;
         private bool _isScanRunning;
 
@@ -43,14 +44,19 @@ namespace OpenRdpGuard.ViewModels
         [ObservableProperty]
         private int _monitorIntervalMinutes = 10;
 
-        public BlacklistViewModel(IFirewallService firewallService, ILogService logService, IConnectionService connectionService)
+        [ObservableProperty]
+        private string _monitoringSummary = string.Empty;
+
+        public BlacklistViewModel(IFirewallService firewallService, ILogService logService, IConnectionService connectionService, IAppSettingsService appSettingsService)
         {
             _firewallService = firewallService;
             _logService = logService;
             _connectionService = connectionService;
+            _appSettingsService = appSettingsService;
             _monitorTimer = new DispatcherTimer();
             _monitorTimer.Tick += OnMonitorTimerTick;
-            UpdateMonitorInterval();
+            LoadSettings();
+            UpdateMonitoringSummary();
             _ = RefreshList();
         }
 
@@ -130,17 +136,38 @@ namespace OpenRdpGuard.ViewModels
             await _connectionService.KillConnectionsByRemoteIpAsync(ips);
         }
 
+        private void LoadSettings()
+        {
+            var savedHours = _appSettingsService.GetBlacklistScanHours();
+            if (ScanOptions.Contains(savedHours))
+            {
+                SelectedScanHours = savedHours;
+            }
+
+            MonitorIntervalMinutes = Math.Max(1, _appSettingsService.GetBlacklistMonitorIntervalMinutes());
+            UpdateMonitorInterval();
+
+            IsMonitoring = _appSettingsService.GetBlacklistMonitoringEnabled();
+            if (IsMonitoring)
+            {
+                _monitorTimer.Start();
+            }
+        }
+
         partial void OnIsMonitoringChanged(bool value)
         {
+            _appSettingsService.SetBlacklistMonitoringEnabled(value);
             if (value)
             {
                 UpdateMonitorInterval();
                 _monitorTimer.Start();
+                _ = ScanAndBlock();
             }
             else
             {
                 _monitorTimer.Stop();
             }
+            UpdateMonitoringSummary();
         }
 
         partial void OnMonitorIntervalMinutesChanged(int value)
@@ -151,7 +178,21 @@ namespace OpenRdpGuard.ViewModels
                 return;
             }
 
+            _appSettingsService.SetBlacklistMonitorIntervalMinutes(value);
             UpdateMonitorInterval();
+            UpdateMonitoringSummary();
+        }
+
+        partial void OnSelectedScanHoursChanged(int value)
+        {
+            _appSettingsService.SetBlacklistScanHours(value);
+            UpdateMonitoringSummary();
+        }
+
+        private void UpdateMonitoringSummary()
+        {
+            var status = IsMonitoring ? "监控开启" : "监控关闭";
+            MonitoringSummary = $"已保存：范围 {SelectedScanHours} 小时，{status}，每 {MonitorIntervalMinutes} 分钟扫描一次";
         }
 
         private void UpdateMonitorInterval()

@@ -98,6 +98,7 @@ namespace OpenRdpGuard
             _mainWindow.Show();
             InitializeTray(_mainWindow);
             StartPipeListener();
+            _ = _host.Services.GetRequiredService<BlacklistViewModel>();
 
             base.OnStartup(e);
         }

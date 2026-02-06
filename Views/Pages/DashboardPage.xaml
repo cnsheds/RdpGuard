@@ -13,35 +13,40 @@
                 <StackPanel>
                     <TextBlock Text="当前状态" Style="{StaticResource PageTitleTextStyle}" Margin="0,0,0,12" />
 
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                        <TextBlock Text="&#xE7F4;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0" Foreground="{DynamicResource MutedTextBrush}" />
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8" VerticalAlignment="Center">
+                        <TextBlock Text="&#xE7F4;" FontFamily="Segoe MDL2 Assets" Margin="0,2,8,0" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" />
                         <TextBlock Text="RDP 端口: " Foreground="{DynamicResource SecondaryTextBrush}" />
                         <TextBlock Text="{Binding RdpPort}" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" />
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                        <TextBlock Text="&#xE73E;" FontFamily="Segoe MDL2 Assets" Foreground="{DynamicResource SuccessBrush}" Margin="0,0,8,0" />
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8" VerticalAlignment="Center">
+                        <TextBlock Text="&#xE73E;" FontFamily="Segoe MDL2 Assets" Foreground="{DynamicResource SuccessBrush}" Margin="0,2,8,0" VerticalAlignment="Center" />
                         <TextBlock Text="防火墙规则: " Foreground="{DynamicResource SecondaryTextBrush}" />
                         <TextBlock Text="{Binding FirewallStatusText}" Foreground="{Binding FirewallStatusBrush}" FontWeight="SemiBold" />
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                        <TextBlock Text="&#xE72E;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0" Foreground="{DynamicResource MutedTextBrush}" />
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8" VerticalAlignment="Center">
+                        <TextBlock Text="&#xE72E;" FontFamily="Segoe MDL2 Assets" Margin="0,2,8,0" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" />
                         <TextBlock Text="白名单: " Foreground="{DynamicResource SecondaryTextBrush}" />
                         <TextBlock Text="{Binding WhitelistStatusText}" Foreground="{DynamicResource PrimaryTextBrush}" />
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                        <TextBlock Text="&#xE8EF;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0" Foreground="{DynamicResource MutedTextBrush}" />
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8" VerticalAlignment="Center">
+                        <TextBlock Text="&#xE8EF;" FontFamily="Segoe MDL2 Assets" Margin="0,2,8,0" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" />
                         <TextBlock Text="当前连接数: " Foreground="{DynamicResource SecondaryTextBrush}" />
                         <TextBlock Text="{Binding ConnectionCount}" Foreground="{DynamicResource PrimaryTextBrush}" />
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                        <TextBlock Text="&#xEA39;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0" Foreground="{DynamicResource DangerBrush}" />
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Center">
+                        <TextBlock Text="&#xEA39;" FontFamily="Segoe MDL2 Assets" Margin="0,2,8,0" Foreground="{DynamicResource DangerBrush}" VerticalAlignment="Center" />
                         <TextBlock Text="IP黑名单: 已封禁 " Foreground="{DynamicResource SecondaryTextBrush}" />
                         <TextBlock Text="{Binding BlockedCount}" Foreground="{DynamicResource DangerBrush}" FontWeight="SemiBold" />
                         <TextBlock Text=" 个恶意IP" Foreground="{DynamicResource DangerBrush}" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Center">
+                        <TextBlock Text="&#xE8A7;" FontFamily="Segoe MDL2 Assets" Margin="0,2,8,0" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding BlacklistMonitoringText}" Foreground="{Binding BlacklistMonitoringBrush}" />
                     </StackPanel>
 
                     <Button Content="刷新状态" Width="120" HorizontalAlignment="Left" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding RefreshCommand}" />

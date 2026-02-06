@@ -15,6 +15,9 @@ namespace OpenRdpGuard.Services
     {
         public string Theme { get; set; } = AppTheme.Light.ToString();
         public bool WhitelistEnabled { get; set; } = false;
+        public int BlacklistScanHours { get; set; } = 24;
+        public bool BlacklistMonitoringEnabled { get; set; } = false;
+        public int BlacklistMonitorIntervalMinutes { get; set; } = 10;
     }
 
     public interface IAppSettingsService
@@ -23,6 +26,12 @@ namespace OpenRdpGuard.Services
         void SetTheme(AppTheme theme);
         bool GetWhitelistEnabled();
         void SetWhitelistEnabled(bool enabled);
+        int GetBlacklistScanHours();
+        void SetBlacklistScanHours(int hours);
+        bool GetBlacklistMonitoringEnabled();
+        void SetBlacklistMonitoringEnabled(bool enabled);
+        int GetBlacklistMonitorIntervalMinutes();
+        void SetBlacklistMonitorIntervalMinutes(int minutes);
     }
 
     public class AppSettingsService : IAppSettingsService
@@ -55,6 +64,39 @@ namespace OpenRdpGuard.Services
         public void SetWhitelistEnabled(bool enabled)
         {
             _settings.WhitelistEnabled = enabled;
+            Save();
+        }
+
+        public int GetBlacklistScanHours()
+        {
+            return _settings.BlacklistScanHours;
+        }
+
+        public void SetBlacklistScanHours(int hours)
+        {
+            _settings.BlacklistScanHours = hours;
+            Save();
+        }
+
+        public bool GetBlacklistMonitoringEnabled()
+        {
+            return _settings.BlacklistMonitoringEnabled;
+        }
+
+        public void SetBlacklistMonitoringEnabled(bool enabled)
+        {
+            _settings.BlacklistMonitoringEnabled = enabled;
+            Save();
+        }
+
+        public int GetBlacklistMonitorIntervalMinutes()
+        {
+            return _settings.BlacklistMonitorIntervalMinutes;
+        }
+
+        public void SetBlacklistMonitorIntervalMinutes(int minutes)
+        {
+            _settings.BlacklistMonitorIntervalMinutes = minutes;
             Save();
         }
 

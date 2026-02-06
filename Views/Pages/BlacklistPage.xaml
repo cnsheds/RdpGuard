@@ -28,7 +28,7 @@
                                   Foreground="{DynamicResource SecondaryTextBrush}" />
                         <TextBlock Text="监控间隔(分钟)" VerticalAlignment="Center" Margin="8,0,6,0"
                                    Foreground="{DynamicResource SecondaryTextBrush}" />
-                        <TextBox Width="60"
+                        <TextBox Width="90"
                                  Text="{Binding MonitorIntervalMinutes, UpdateSourceTrigger=PropertyChanged}"
                                  PreviewTextInput="MonitorInterval_PreviewTextInput"
                                  DataObject.Pasting="MonitorInterval_OnPaste"
@@ -36,6 +36,9 @@
                                  Foreground="{DynamicResource PrimaryTextBrush}"
                                  BorderBrush="{DynamicResource CardBorderBrush}" />
                     </StackPanel>
+                    <Border Background="#FFF3C2" CornerRadius="4" Padding="8,4" Margin="0,12,0,0">
+                        <TextBlock Text="{Binding MonitoringSummary}" Foreground="#C62828" FontWeight="SemiBold" />
+                    </Border>
                 </StackPanel>
             </Border>
 

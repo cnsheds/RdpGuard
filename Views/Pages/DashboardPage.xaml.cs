@@ -1,4 +1,5 @@
 using OpenRdpGuard.ViewModels;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace OpenRdpGuard.Views.Pages
@@ -12,6 +13,15 @@ namespace OpenRdpGuard.Views.Pages
             InitializeComponent();
             ViewModel = viewModel;
             DataContext = viewModel;
+            IsVisibleChanged += OnIsVisibleChanged;
+        }
+
+        private void OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (IsVisible)
+            {
+                ViewModel.RefreshCommand.Execute(null);
+            }
         }
     }
 }

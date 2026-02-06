@@ -9,6 +9,7 @@ namespace OpenRdpGuard.ViewModels
 {
     public partial class DashboardViewModel : ObservableObject
     {
+        private readonly IAppSettingsService _appSettingsService;
         private readonly ISettingsService _settingsService;
         private readonly IFirewallService _firewallService;
         private readonly IWhitelistService _whitelistService;
@@ -28,6 +29,12 @@ namespace OpenRdpGuard.ViewModels
         private string _whitelistStatusText = "Any";
 
         [ObservableProperty]
+        private string _blacklistMonitoringText = "监控关闭";
+
+        [ObservableProperty]
+        private Brush _blacklistMonitoringBrush = Brushes.Gray;
+
+        [ObservableProperty]
         private int _connectionCount = 0;
 
         [ObservableProperty]
@@ -45,12 +52,14 @@ namespace OpenRdpGuard.ViewModels
         [ObservableProperty]
         private System.Windows.Media.Brush _firewallServiceStatusBrush = MediaBrushes.Gray;
 
-        public DashboardViewModel(ISettingsService settingsService,
+        public DashboardViewModel(IAppSettingsService appSettingsService,
+            ISettingsService settingsService,
             IFirewallService firewallService,
             IWhitelistService whitelistService,
             IConnectionService connectionService,
             ISystemService systemService)
         {
+            _appSettingsService = appSettingsService;
             _settingsService = settingsService;
             _firewallService = firewallService;
             _whitelistService = whitelistService;
@@ -77,6 +86,14 @@ namespace OpenRdpGuard.ViewModels
             FirewallServiceStatusBrush = fwRunning ? MediaBrushes.Green : MediaBrushes.Red;
 
             WhitelistStatusText = _whitelistService.IsWhitelistEnabled() ? "仅白名单" : "Any";
+
+            var monitoringEnabled = _appSettingsService.GetBlacklistMonitoringEnabled();
+            var monitorMinutes = _appSettingsService.GetBlacklistMonitorIntervalMinutes();
+            var scanHours = _appSettingsService.GetBlacklistScanHours();
+            BlacklistMonitoringText = monitoringEnabled
+                ? $"黑名单监控：开启，每 {monitorMinutes} 分钟扫描（范围 {scanHours} 小时）"
+                : "黑名单监控：关闭";
+            BlacklistMonitoringBrush = monitoringEnabled ? Brushes.Green : Brushes.Gray;
 
             try
             {
