@@ -24,11 +24,11 @@ jobs:
         run: dotnet restore
 
       - name: Publish (win-x64)
-        run: dotnet publish OpenRdpGuard/OpenRdpGuard.csproj -c Release -r win-x64 /p:PublishSingleFile=true /p:SelfContained=false
+        run: dotnet publish OpenRdpGuard.csproj -c Release -r win-x64 /p:PublishSingleFile=true /p:SelfContained=false
 
       - name: Zip
         run: |
-          $out = "OpenRdpGuard\bin\Release\net8.0-windows\win-x64\publish"
+          $out = "bin\Release\net8.0-windows\win-x64\publish"
           $zip = "RdpGuard-win-x64.zip"
           if (Test-Path $zip) { Remove-Item $zip }
           Compress-Archive -Path "$out\*" -DestinationPath $zip
