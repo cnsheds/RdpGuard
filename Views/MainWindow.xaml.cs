@@ -64,18 +64,6 @@ namespace OpenRdpGuard.Views
             }
         }
 
-        private static WpfListBox? GetFirstNonEmptyList(params WpfListBox?[] lists)
-        {
-            foreach (var list in lists)
-            {
-                if (list != null && list.Items.Count > 0)
-                {
-                    return list;
-                }
-            }
-            return null;
-        }
-
         private static void ClearOtherLists(WpfListBox active, params WpfListBox?[] lists)
         {
             foreach (var list in lists)

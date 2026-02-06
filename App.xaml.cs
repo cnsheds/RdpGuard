@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenRdpGuard.ViewModels;
 using OpenRdpGuard.Views;
@@ -14,6 +14,8 @@ using System.IO.Pipes;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Shapes;
 using Application = System.Windows.Application;
 
 namespace OpenRdpGuard
@@ -133,7 +135,16 @@ namespace OpenRdpGuard
             };
 
             var menu = new ContextMenu();
-            var exitItem = new MenuItem { Header = "退出" };
+            var exitIcon = new System.Windows.Shapes.Path
+            {
+                Data = Geometry.Parse("M3,3 L12,12 M12,3 L3,12"),
+                Stroke = System.Windows.Media.Brushes.DarkRed,
+                StrokeThickness = 2,
+                Width = 10,
+                Height = 10,
+                Stretch = Stretch.Uniform
+            };
+            var exitItem = new MenuItem { Header = "退出", Icon = exitIcon };
             exitItem.Click += (_, __) => ExitFromTray();
             menu.Items.Add(exitItem);
             _trayIcon.ContextMenu = menu;

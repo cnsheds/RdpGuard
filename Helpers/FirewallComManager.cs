@@ -110,26 +110,6 @@ namespace OpenRdpGuard.Helpers
             rule.Enabled = enabled;
         }
 
-        public void UpsertBlockRule(string ruleName, int protocol, int port)
-        {
-            var policy = GetPolicy();
-            var rule = FindRule(ruleName);
-            if (rule == null)
-            {
-                rule = Activator.CreateInstance(Type.GetTypeFromProgID("HNetCfg.FWRule")!);
-                rule.Name = ruleName;
-                rule.Direction = DirectionIn;
-                rule.Action = ActionBlock;
-                rule.Enabled = true;
-                rule.Protocol = protocol;
-                rule.Profiles = ProfileAll;
-                policy.Rules.Add(rule);
-            }
-
-            rule.Protocol = protocol;
-            rule.LocalPorts = port.ToString();
-            rule.Enabled = true;
-        }
 
         public List<string> GetRemoteAddressesFromTcpAllowRule()
         {
@@ -188,29 +168,6 @@ namespace OpenRdpGuard.Helpers
             return (bool)tcp.Enabled && (bool)udp.Enabled;
         }
 
-        public void DeleteRulesByPrefix(string prefix)
-        {
-            if (string.IsNullOrWhiteSpace(prefix))
-            {
-                return;
-            }
-
-            var policy = GetPolicy();
-            var targets = new List<string>();
-            foreach (var rule in policy.Rules)
-            {
-                var name = rule.Name as string;
-                if (!string.IsNullOrWhiteSpace(name) && name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-                {
-                    targets.Add(name);
-                }
-            }
-
-            foreach (var name in targets)
-            {
-                policy.Rules.Remove(name);
-            }
-        }
 
         private dynamic? FindRule()
         {
