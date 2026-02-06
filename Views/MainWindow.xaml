@@ -80,7 +80,7 @@
 
         <Border Grid.Row="1" Grid.Column="0" Background="{DynamicResource SidebarBackgroundBrush}">
             <DockPanel>
-                <TextBlock DockPanel.Dock="Bottom" Text="v1.0.0" Margin="16,8" FontSize="11" Foreground="{DynamicResource MutedTextBrush}" />
+                <TextBlock DockPanel.Dock="Bottom" Text="{Binding AppVersion, StringFormat='v{0}'}" Margin="16,8" FontSize="11" Foreground="{DynamicResource MutedTextBrush}" />
 
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel Margin="16,16,16,8">

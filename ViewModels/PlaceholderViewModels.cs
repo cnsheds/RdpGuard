@@ -6,5 +6,4 @@ namespace OpenRdpGuard.ViewModels
     public partial class WhitelistViewModel : ObservableObject {}
     public partial class ConnectionsViewModel : ObservableObject {}
     public partial class UsersViewModel : ObservableObject {}
-    public partial class SettingsViewModel : ObservableObject {}
 }

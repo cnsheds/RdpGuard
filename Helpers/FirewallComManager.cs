@@ -38,11 +38,14 @@ namespace OpenRdpGuard.Helpers
 
         public void DeleteRuleIfExists()
         {
-            var policy = GetPolicy();
             var rule = FindRule();
             if (rule != null)
             {
-                policy.Rules.Remove(rule.Name);
+                var name = rule.Name as string;
+                if (!string.IsNullOrWhiteSpace(name))
+                {
+                    GetPolicy().Rules.Remove(name);
+                }
             }
         }
 
@@ -52,7 +55,7 @@ namespace OpenRdpGuard.Helpers
             var rule = FindRule();
             if (rule == null)
             {
-                rule = Activator.CreateInstance(Type.GetTypeFromProgID("HNetCfg.FWRule")!);
+                rule = CreateRule();
                 rule.Name = _ruleName;
                 rule.Direction = DirectionIn;
                 rule.Action = ActionBlock;
@@ -73,7 +76,7 @@ namespace OpenRdpGuard.Helpers
                 return new List<string>();
             }
 
-            var raw = (string)(rule.RemoteAddresses ?? string.Empty);
+            var raw = rule.RemoteAddresses as string ?? string.Empty;
             return SplitRemoteAddresses(raw);
         }
 
@@ -94,7 +97,7 @@ namespace OpenRdpGuard.Helpers
             var rule = FindRule(ruleName);
             if (rule == null)
             {
-                rule = Activator.CreateInstance(Type.GetTypeFromProgID("HNetCfg.FWRule")!);
+                rule = CreateRule();
                 rule.Name = ruleName;
                 rule.Direction = DirectionIn;
                 rule.Action = ActionAllow;
@@ -110,7 +113,6 @@ namespace OpenRdpGuard.Helpers
             rule.Enabled = enabled;
         }
 
-
         public List<string> GetRemoteAddressesFromTcpAllowRule()
         {
             if (string.IsNullOrWhiteSpace(_tcpAllowRuleName))
@@ -118,20 +120,19 @@ namespace OpenRdpGuard.Helpers
                 return new List<string>();
             }
 
-            var rule = FindRule(_tcpAllowRuleName);
+            var rule = FindRule(_tcpAllowRuleName!);
             if (rule == null)
             {
                 return new List<string>();
             }
 
-            var raw = (string)(rule.RemoteAddresses ?? string.Empty);
+            var raw = rule.RemoteAddresses as string ?? string.Empty;
             return SplitRemoteAddresses(raw);
         }
 
         public void SetRemoteDesktopRulesEnabled(bool enabled)
         {
-            var policy = GetPolicy();
-            foreach (var rule in policy.Rules)
+            foreach (var rule in EnumerateRules())
             {
                 if (IsRemoteDesktopRule(rule))
                 {
@@ -147,8 +148,8 @@ namespace OpenRdpGuard.Helpers
                 return;
             }
 
-            SetRuleEnabled(_tcpAllowRuleName, enabled);
-            SetRuleEnabled(_udpAllowRuleName, enabled);
+            SetRuleEnabled(_tcpAllowRuleName!, enabled);
+            SetRuleEnabled(_udpAllowRuleName!, enabled);
         }
 
         public bool AreAllowRulesEnabled()
@@ -158,21 +159,19 @@ namespace OpenRdpGuard.Helpers
                 return false;
             }
 
-            var tcp = FindRule(_tcpAllowRuleName);
-            var udp = FindRule(_udpAllowRuleName);
+            var tcp = FindRule(_tcpAllowRuleName!);
+            var udp = FindRule(_udpAllowRuleName!);
             if (tcp == null || udp == null)
             {
                 return false;
             }
 
-            return (bool)tcp.Enabled && (bool)udp.Enabled;
+            return (bool)(tcp.Enabled ?? false) && (bool)(udp.Enabled ?? false);
         }
-
 
         private dynamic? FindRule()
         {
-            var policy = GetPolicy();
-            foreach (var rule in policy.Rules)
+            foreach (var rule in EnumerateRules())
             {
                 var name = rule.Name as string;
                 if (!string.IsNullOrWhiteSpace(name) && string.Equals(name, _ruleName, StringComparison.OrdinalIgnoreCase))
@@ -186,8 +185,7 @@ namespace OpenRdpGuard.Helpers
 
         private dynamic? FindRule(string ruleName)
         {
-            var policy = GetPolicy();
-            foreach (var rule in policy.Rules)
+            foreach (var rule in EnumerateRules())
             {
                 var name = rule.Name as string;
                 if (!string.IsNullOrWhiteSpace(name) && string.Equals(name, ruleName, StringComparison.OrdinalIgnoreCase))
@@ -201,11 +199,14 @@ namespace OpenRdpGuard.Helpers
 
         private void DeleteRuleIfExists(string ruleName)
         {
-            var policy = GetPolicy();
             var rule = FindRule(ruleName);
             if (rule != null)
             {
-                policy.Rules.Remove(rule.Name);
+                var name = rule.Name as string;
+                if (!string.IsNullOrWhiteSpace(name))
+                {
+                    GetPolicy().Rules.Remove(name);
+                }
             }
         }
 
@@ -233,7 +234,22 @@ namespace OpenRdpGuard.Helpers
 
         private static dynamic GetPolicy()
         {
-            return Activator.CreateInstance(Type.GetTypeFromProgID("HNetCfg.FwPolicy2")!);
+            var type = Type.GetTypeFromProgID("HNetCfg.FwPolicy2");
+            if (type == null)
+            {
+                throw new InvalidOperationException("Firewall COM component not available.");
+            }
+            return Activator.CreateInstance(type)!;
+        }
+
+        private static dynamic CreateRule()
+        {
+            var type = Type.GetTypeFromProgID("HNetCfg.FWRule");
+            if (type == null)
+            {
+                throw new InvalidOperationException("Firewall COM rule component not available.");
+            }
+            return Activator.CreateInstance(type)!;
         }
 
         private static string NormalizeRemoteAddresses(string remoteAddresses)
@@ -263,6 +279,21 @@ namespace OpenRdpGuard.Helpers
                 .Select(ip => ip.Trim())
                 .Where(ip => !string.IsNullOrWhiteSpace(ip) && !ip.Equals("Any", StringComparison.OrdinalIgnoreCase))
                 .ToList();
+        }
+
+        private static IEnumerable<dynamic> EnumerateRules()
+        {
+            var policy = GetPolicy();
+            var rules = policy?.Rules;
+            if (rules == null)
+            {
+                yield break;
+            }
+
+            foreach (var rule in rules)
+            {
+                yield return rule;
+            }
         }
     }
 }

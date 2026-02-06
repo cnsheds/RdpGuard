@@ -1,0 +1,39 @@
+name: Release Win-x64
+
+on:
+  release:
+    types: [created]
+
+permissions:
+  contents: write
+
+jobs:
+  build-win:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Publish (win-x64)
+        run: dotnet publish OpenRdpGuard/OpenRdpGuard.csproj -c Release -r win-x64 /p:PublishSingleFile=true /p:SelfContained=false
+
+      - name: Zip
+        run: |
+          $out = "OpenRdpGuard\bin\Release\net8.0-windows\win-x64\publish"
+          $zip = "RdpGuard-win-x64.zip"
+          if (Test-Path $zip) { Remove-Item $zip }
+          Compress-Archive -Path "$out\*" -DestinationPath $zip
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: RdpGuard-win-x64.zip

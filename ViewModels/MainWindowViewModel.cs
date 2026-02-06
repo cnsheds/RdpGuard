@@ -11,6 +11,9 @@ namespace OpenRdpGuard.ViewModels
         private string _applicationTitle = "RdpGuard - 远程桌面安全防护";
 
         [ObservableProperty]
+        private string _appVersion = "1.26.2.6";
+
+        [ObservableProperty]
         private ObservableCollection<NavigationItem> _functionItems;
 
         [ObservableProperty]
