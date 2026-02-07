@@ -14,6 +14,14 @@
 - **主题设置**：浅色/深色/跟随系统。
 - **托盘与单实例**：关闭最小化到托盘，右键退出；重复启动会激活已有窗口。
 
+## 界面截图
+
+![当前状态](Assets/Screenshots/1.png)
+
+![登录统计](Assets/Screenshots/2.png)
+
+![IP黑名单](Assets/Screenshots/3.png)
+
 ## 运行环境
 
 - Windows 10/11 或 Windows Server
@@ -71,3 +79,4 @@ bin\Release\net8.0-windows\win-x64\publish\
 - 重启远程桌面服务
 
 请使用管理员权限运行以获得完整功能。
+
