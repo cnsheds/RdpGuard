@@ -112,9 +112,14 @@ namespace OpenRdpGuard.ViewModels
                 dialog.ShowDialog();
                 return;
             }
+            var successCounts = attempts.Where(a => a.IsSuccess)
+                .GroupBy(a => a.IpAddress)
+                .ToDictionary(g => g.Key, g => g.Count());
+
             var offenders = attempts.Where(a => !a.IsSuccess)
                 .GroupBy(a => a.IpAddress)
                 .Where(g => g.Count() > 3)
+                .Where(g => !successCounts.TryGetValue(g.Key, out var successCount) || successCount <= 1)
                 .Select(g => g.Key)
                 .ToList();
 
