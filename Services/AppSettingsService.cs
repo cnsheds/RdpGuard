@@ -18,6 +18,7 @@ namespace OpenRdpGuard.Services
         public int BlacklistScanHours { get; set; } = 24;
         public bool BlacklistMonitoringEnabled { get; set; } = false;
         public int BlacklistMonitorIntervalMinutes { get; set; } = 10;
+        public bool BlacklistSmartSubnetBlockingEnabled { get; set; } = true;
     }
 
     public interface IAppSettingsService
@@ -32,6 +33,8 @@ namespace OpenRdpGuard.Services
         void SetBlacklistMonitoringEnabled(bool enabled);
         int GetBlacklistMonitorIntervalMinutes();
         void SetBlacklistMonitorIntervalMinutes(int minutes);
+        bool GetBlacklistSmartSubnetBlockingEnabled();
+        void SetBlacklistSmartSubnetBlockingEnabled(bool enabled);
     }
 
     public class AppSettingsService : IAppSettingsService
@@ -97,6 +100,17 @@ namespace OpenRdpGuard.Services
         public void SetBlacklistMonitorIntervalMinutes(int minutes)
         {
             _settings.BlacklistMonitorIntervalMinutes = minutes;
+            Save();
+        }
+
+        public bool GetBlacklistSmartSubnetBlockingEnabled()
+        {
+            return _settings.BlacklistSmartSubnetBlockingEnabled;
+        }
+
+        public void SetBlacklistSmartSubnetBlockingEnabled(bool enabled)
+        {
+            _settings.BlacklistSmartSubnetBlockingEnabled = enabled;
             Save();
         }
 

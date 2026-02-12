@@ -36,9 +36,21 @@
                                  Foreground="{DynamicResource PrimaryTextBrush}"
                                  BorderBrush="{DynamicResource CardBorderBrush}" />
                     </StackPanel>
-                    <Border Background="#FFF3C2" CornerRadius="4" Padding="8,4" Margin="0,12,0,0">
-                        <TextBlock Text="{Binding MonitoringSummary}" Foreground="#C62828" FontWeight="SemiBold" />
-                    </Border>
+                    <Grid Margin="0,12,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <CheckBox Grid.Column="0"
+                                  Content="智能识别 /24 封禁"
+                                  Margin="0,0,12,0"
+                                  VerticalAlignment="Center"
+                                  IsChecked="{Binding SmartSubnetBlockingEnabled}"
+                                  Foreground="{DynamicResource SecondaryTextBrush}" />
+                        <Border Grid.Column="1" Background="#FFF3C2" CornerRadius="4" Padding="8,4">
+                            <TextBlock Text="{Binding MonitoringSummary}" Foreground="#C62828" FontWeight="SemiBold" />
+                        </Border>
+                    </Grid>
                 </StackPanel>
             </Border>
 

@@ -3,8 +3,11 @@ using CommunityToolkit.Mvvm.Input;
 using OpenRdpGuard.Services;
 using OpenRdpGuard.Views.Dialogs;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -46,6 +49,9 @@ namespace OpenRdpGuard.ViewModels
 
         [ObservableProperty]
         private string _monitoringSummary = string.Empty;
+
+        [ObservableProperty]
+        private bool _smartSubnetBlockingEnabled = true;
 
         public BlacklistViewModel(IFirewallService firewallService, ILogService logService, IConnectionService connectionService, IAppSettingsService appSettingsService)
         {
@@ -116,12 +122,43 @@ namespace OpenRdpGuard.ViewModels
                 .GroupBy(a => a.IpAddress)
                 .ToDictionary(g => g.Key, g => g.Count());
 
-            var offenders = attempts.Where(a => !a.IsSuccess)
+            var failedAttempts = attempts.Where(a => !a.IsSuccess).ToList();
+            var offenders = failedAttempts
                 .GroupBy(a => a.IpAddress)
                 .Where(g => g.Count() > 3)
                 .Where(g => !successCounts.TryGetValue(g.Key, out var successCount) || successCount <= 1)
                 .Select(g => g.Key)
                 .ToList();
+
+            var rangeOffenders = new List<(string Cidr, List<string> Ips)>();
+            if (SmartSubnetBlockingEnabled)
+            {
+                var successPrefix16Set = attempts
+                    .Where(a => a.IsSuccess)
+                    .Select(a => TryGetIpv4Prefix16(a.IpAddress))
+                    .Where(prefix => !string.IsNullOrWhiteSpace(prefix))
+                    .ToHashSet(StringComparer.Ordinal);
+
+                var suspiciousFailedRanges = failedAttempts
+                    .Select(a =>
+                    {
+                        var prefix16 = TryGetIpv4Prefix16(a.IpAddress);
+                        var prefix24 = TryGetIpv4Prefix24(a.IpAddress);
+                        return new { a.IpAddress, Prefix16 = prefix16, Prefix24 = prefix24 };
+                    })
+                    .Where(x => !string.IsNullOrWhiteSpace(x.Prefix16) && !string.IsNullOrWhiteSpace(x.Prefix24))
+                    .GroupBy(x => new { x.Prefix16, x.Prefix24 })
+                    .Where(g => g.Select(x => x.IpAddress).Distinct(StringComparer.Ordinal).Count() > 3)
+                    .Where(g => !successPrefix16Set.Contains(g.Key.Prefix16!))
+                    .ToList();
+
+                rangeOffenders = suspiciousFailedRanges
+                    .Select(g => (
+                        Cidr: $"{g.Key.Prefix24}.0/24",
+                        Ips: g.Select(x => x.IpAddress).Distinct(StringComparer.Ordinal).ToList()
+                    ))
+                    .ToList();
+            }
 
             foreach (var ip in offenders)
             {
@@ -130,8 +167,49 @@ namespace OpenRdpGuard.ViewModels
                 await _connectionService.KillConnectionsByRemoteIpAsync(new[] { ip });
             }
 
+            foreach (var range in rangeOffenders)
+            {
+                await _firewallService.BlockIpAsync(range.Cidr);
+                if (range.Ips.Count > 0)
+                {
+                    await _connectionService.KillConnectionsByRemoteIpAsync(range.Ips);
+                }
+            }
+
             await RefreshList();
             _isScanRunning = false;
+        }
+
+        private static string? TryGetIpv4Prefix16(string ip)
+        {
+            if (!TryParseIpv4(ip, out var bytes))
+            {
+                return null;
+            }
+
+            return $"{bytes[0]}.{bytes[1]}";
+        }
+
+        private static string? TryGetIpv4Prefix24(string ip)
+        {
+            if (!TryParseIpv4(ip, out var bytes))
+            {
+                return null;
+            }
+
+            return $"{bytes[0]}.{bytes[1]}.{bytes[2]}";
+        }
+
+        private static bool TryParseIpv4(string ip, out byte[] bytes)
+        {
+            bytes = Array.Empty<byte>();
+            if (!IPAddress.TryParse(ip, out var address) || address.AddressFamily != AddressFamily.InterNetwork)
+            {
+                return false;
+            }
+
+            bytes = address.GetAddressBytes();
+            return bytes.Length == 4;
         }
 
         [RelayCommand]
@@ -157,6 +235,8 @@ namespace OpenRdpGuard.ViewModels
             {
                 _monitorTimer.Start();
             }
+
+            SmartSubnetBlockingEnabled = _appSettingsService.GetBlacklistSmartSubnetBlockingEnabled();
         }
 
         partial void OnIsMonitoringChanged(bool value)
@@ -192,6 +272,11 @@ namespace OpenRdpGuard.ViewModels
         {
             _appSettingsService.SetBlacklistScanHours(value);
             UpdateMonitoringSummary();
+        }
+
+        partial void OnSmartSubnetBlockingEnabledChanged(bool value)
+        {
+            _appSettingsService.SetBlacklistSmartSubnetBlockingEnabled(value);
         }
 
         private void UpdateMonitoringSummary()
