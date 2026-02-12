@@ -1,13 +1,15 @@
-<Page x:Class="OpenRdpGuard.Views.Pages.LoginStatsPage"
+﻿<Page x:Class="OpenRdpGuard.Views.Pages.LoginStatsPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:conv="clr-namespace:OpenRdpGuard.Converters"
       xmlns:vm="clr-namespace:OpenRdpGuard.ViewModels"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance vm:LoginStatsViewModel, IsDesignTimeCreatable=True}">
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <conv:CountToMaxRowsHeightConverter x:Key="CountToMaxRowsHeightConverter" />
     </Page.Resources>
 
     <ScrollViewer>
@@ -77,16 +79,25 @@
                         <TextBlock Text="&#xE7BA;" FontFamily="Segoe MDL2 Assets" Margin="0,0,6,0" Foreground="{DynamicResource MutedTextBrush}" />
                         <TextBlock Text="失败登录 Top IP（可能的攻击来源）" Style="{StaticResource SectionTitleTextStyle}" />
                     </StackPanel>
-                    <ItemsControl ItemsSource="{Binding TopFailedIps}" Visibility="{Binding IsNotScanning, Converter={StaticResource BoolToVis}}">
+                    <ItemsControl ItemsSource="{Binding TopFailedIps}"
+                                  Visibility="{Binding IsNotScanning, Converter={StaticResource BoolToVis}}"
+                                  MaxHeight="{Binding TopFailedIps.Count, Converter={StaticResource CountToMaxRowsHeightConverter}, ConverterParameter=38}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Vertical" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal" Margin="0,2">
-                                    <Ellipse Width="8" Height="8" Fill="{DynamicResource DangerBrush}" Margin="0,0,8,0" />
-                                    <TextBlock Text="{Binding Label}" Foreground="{DynamicResource DangerBrush}" />
-                                    <TextBlock Text=" - " Foreground="{DynamicResource DangerBrush}" />
-                                    <TextBlock Text="{Binding Count}" Foreground="{DynamicResource DangerBrush}" />
-                                    <TextBlock Text=" 次" Foreground="{DynamicResource DangerBrush}" />
-                                </StackPanel>
+                                <Border Width="210" Margin="0,2,10,6" Padding="8,4" Background="#26E06B6B" CornerRadius="6">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{DynamicResource DangerBrush}" Margin="0,0,8,0" />
+                                        <TextBlock Text="{Binding Label}" Foreground="{DynamicResource DangerBrush}" />
+                                        <TextBlock Text=" - " Foreground="{DynamicResource DangerBrush}" />
+                                        <TextBlock Text="{Binding Count}" Foreground="{DynamicResource DangerBrush}" />
+                                        <TextBlock Text=" 次" Foreground="{DynamicResource DangerBrush}" />
+                                    </StackPanel>
+                                </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
@@ -95,16 +106,25 @@
                         <TextBlock Text="&#xE7BA;" FontFamily="Segoe MDL2 Assets" Margin="0,0,6,0" Foreground="{DynamicResource MutedTextBrush}" />
                         <TextBlock Text="成功登录 Top IP:" Style="{StaticResource SectionTitleTextStyle}" />
                     </StackPanel>
-                    <ItemsControl ItemsSource="{Binding TopSuccessIps}" Visibility="{Binding IsNotScanning, Converter={StaticResource BoolToVis}}">
+                    <ItemsControl ItemsSource="{Binding TopSuccessIps}"
+                                  Visibility="{Binding IsNotScanning, Converter={StaticResource BoolToVis}}"
+                                  MaxHeight="{Binding TopSuccessIps.Count, Converter={StaticResource CountToMaxRowsHeightConverter}, ConverterParameter=38}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Vertical" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal" Margin="0,2">
-                                    <Rectangle Width="8" Height="8" Fill="{DynamicResource SuccessBrush}" Margin="0,0,8,0" />
-                                    <TextBlock Text="{Binding Label}" Foreground="{DynamicResource SuccessBrush}" />
-                                    <TextBlock Text=" - " Foreground="{DynamicResource SuccessBrush}" />
-                                    <TextBlock Text="{Binding Count}" Foreground="{DynamicResource SuccessBrush}" />
-                                    <TextBlock Text=" 次" Foreground="{DynamicResource SuccessBrush}" />
-                                </StackPanel>
+                                <Border Width="210" Margin="0,2,10,6" Padding="8,4" Background="#2637B24D" CornerRadius="6">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Rectangle Width="8" Height="8" Fill="{DynamicResource SuccessBrush}" Margin="0,0,8,0" />
+                                        <TextBlock Text="{Binding Label}" Foreground="{DynamicResource SuccessBrush}" />
+                                        <TextBlock Text=" - " Foreground="{DynamicResource SuccessBrush}" />
+                                        <TextBlock Text="{Binding Count}" Foreground="{DynamicResource SuccessBrush}" />
+                                        <TextBlock Text=" 次" Foreground="{DynamicResource SuccessBrush}" />
+                                    </StackPanel>
+                                </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
@@ -113,7 +133,14 @@
                         <TextBlock Text="&#xE7BA;" FontFamily="Segoe MDL2 Assets" Margin="0,0,6,0" Foreground="{DynamicResource MutedTextBrush}" />
                         <TextBlock Text="尝试登录的失败账号:" Style="{StaticResource SectionTitleTextStyle}" />
                     </StackPanel>
-                    <ItemsControl ItemsSource="{Binding TopFailedUsers}" Visibility="{Binding IsNotScanning, Converter={StaticResource BoolToVis}}">
+                    <ItemsControl ItemsSource="{Binding TopFailedUsers}"
+                                  Visibility="{Binding IsNotScanning, Converter={StaticResource BoolToVis}}"
+                                  MaxHeight="{Binding TopFailedUsers.Count, Converter={StaticResource CountToMaxRowsHeightConverter}, ConverterParameter=30}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Vertical" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" Margin="0,2">
@@ -131,4 +158,3 @@
         </StackPanel>
     </ScrollViewer>
 </Page>
-

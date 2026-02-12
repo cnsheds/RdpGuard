@@ -77,14 +77,14 @@ namespace OpenRdpGuard.ViewModels
             TopFailedIps = new ObservableCollection<StatItem>(
                 failed.GroupBy(a => a.IpAddress)
                     .OrderByDescending(g => g.Count())
-                    .Take(5)
+                    .Take(15)
                     .Select(g => new StatItem { Label = g.Key, Count = g.Count() })
             );
 
             TopSuccessIps = new ObservableCollection<StatItem>(
                 success.GroupBy(a => a.IpAddress)
                     .OrderByDescending(g => g.Count())
-                    .Take(5)
+                    .Take(15)
                     .Select(g => new StatItem { Label = g.Key, Count = g.Count() })
             );
 
@@ -92,7 +92,7 @@ namespace OpenRdpGuard.ViewModels
                 failed.Where(a => !string.IsNullOrWhiteSpace(a.Username))
                     .GroupBy(a => a.Username)
                     .OrderByDescending(g => g.Count())
-                    .Take(5)
+                    .Take(15)
                     .Select(g => new StatItem { Label = g.Key, Count = g.Count() })
             );
             IsScanning = false;
