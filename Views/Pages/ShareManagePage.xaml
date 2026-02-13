@@ -1,0 +1,151 @@
+﻿<Page x:Class="OpenRdpGuard.Views.Pages.ShareManagePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:vm="clr-namespace:OpenRdpGuard.ViewModels"
+      mc:Ignorable="d"
+      d:DataContext="{d:DesignInstance vm:ShareManageViewModel, IsDesignTimeCreatable=True}">
+
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Style="{StaticResource CardBorderStyle}">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE8A7;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" />
+                    <TextBlock Text="共享管理" Style="{StaticResource PageTitleTextStyle}" />
+                </StackPanel>
+                <TextBlock Margin="0,8,0,0"
+                           Text="可删除共享，或通过策略启用/禁用默认管理共享（C$/D$/ADMIN$）。"
+                           Foreground="{DynamicResource SecondaryTextBrush}" />
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="1" Style="{StaticResource CardBorderStyle}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <CheckBox Grid.Column="0"
+                          Content="启用默认管理共享"
+                          IsChecked="{Binding AutoAdminShareEnabled}"
+                          VerticalAlignment="Center"
+                          Foreground="{DynamicResource SecondaryTextBrush}" />
+                <Button Grid.Column="1"
+                        Content="应用策略"
+                        Margin="12,0,0,0"
+                        Width="100"
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        Command="{Binding ApplyAutoAdminSharePolicyCommand}" />
+                <Button Grid.Column="2"
+                        Content="刷新列表"
+                        Margin="8,0,0,0"
+                        Width="100"
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        Command="{Binding RefreshCommand}" />
+                <TextBlock Grid.Column="3"
+                           Margin="12,0,0,0"
+                           VerticalAlignment="Center"
+                           Text="{Binding StatusMessage}"
+                           Foreground="{DynamicResource WarningBrush}" />
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="当前共享列表" Style="{StaticResource SectionTitleTextStyle}" VerticalAlignment="Center" />
+                    <Button Content="删除选中共享"
+                            Margin="12,0,0,0"
+                            Width="120"
+                            Style="{StaticResource PrimaryButtonStyle}"
+                            Command="{Binding DeleteSelectedCommand}" />
+                </StackPanel>
+
+                <DataGrid Grid.Row="1"
+                          ItemsSource="{Binding Shares}"
+                          SelectedItem="{Binding SelectedShare}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          HeadersVisibility="Column"
+                          RowHeaderWidth="0"
+                          BorderBrush="{DynamicResource CardBorderBrush}"
+                          BorderThickness="1"
+                          Background="{DynamicResource CardBackgroundBrush}"
+                          Foreground="{DynamicResource PrimaryTextBrush}"
+                          GridLinesVisibility="Horizontal"
+                          HorizontalGridLinesBrush="{DynamicResource CardBorderBrush}">
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+                            <Setter Property="BorderThickness" Value="0,0,0,1" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                            <Setter Property="FontSize" Value="14" />
+                            <Setter Property="MinHeight" Value="32" />
+                        </Style>
+                        <Style TargetType="DataGridRow">
+                            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="{DynamicResource ListSelectionActiveBrush}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource ListSelectionActiveTextBrush}" />
+                                </Trigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsSelected" Value="True" />
+                                        <Condition Property="Selector.IsSelectionActive" Value="False" />
+                                    </MultiTrigger.Conditions>
+                                    <Setter Property="Background" Value="{DynamicResource ListSelectionInactiveBrush}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource ListSelectionInactiveTextBrush}" />
+                                </MultiTrigger>
+                            </Style.Triggers>
+                        </Style>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="{DynamicResource ListSelectionActiveBrush}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource ListSelectionActiveTextBrush}" />
+                                </Trigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsSelected" Value="True" />
+                                        <Condition Property="Selector.IsSelectionActive" Value="False" />
+                                    </MultiTrigger.Conditions>
+                                    <Setter Property="Background" Value="{DynamicResource ListSelectionInactiveBrush}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource ListSelectionInactiveTextBrush}" />
+                                </MultiTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.Resources>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="共享名" Binding="{Binding Name}" Width="130" />
+                        <DataGridTextColumn Header="资源路径" Binding="{Binding Path}" Width="*" />
+                        <DataGridTextColumn Header="注释" Binding="{Binding Remark}" Width="220" />
+                        <DataGridCheckBoxColumn Header="默认管理共享" Binding="{Binding IsAdminShare}" Width="110" />
+                        <DataGridCheckBoxColumn Header="系统共享" Binding="{Binding IsSystemShare}" Width="90" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+    </Grid>
+</Page>
+

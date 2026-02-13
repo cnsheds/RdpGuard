@@ -1,4 +1,4 @@
-<Page x:Class="OpenRdpGuard.Views.Pages.ConnectionsPage"
+﻿<Page x:Class="OpenRdpGuard.Views.Pages.ConnectionsPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -16,7 +16,7 @@
         <Border Style="{StaticResource CardBorderStyle}">
             <Grid>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="&#xE774;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0" Foreground="{DynamicResource MutedTextBrush}" />
+                    <TextBlock Text="&#xE774;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" />
                     <TextBlock Text="实时连接" Style="{StaticResource PageTitleTextStyle}" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">

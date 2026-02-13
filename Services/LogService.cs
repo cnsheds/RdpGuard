@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
@@ -28,7 +28,7 @@ namespace OpenRdpGuard.Services
                     var milliseconds = (long)duration.TotalMilliseconds;
                     var query = $"*[System[(EventID=4625 or EventID=4624) and TimeCreated[timediff(@SystemTime) <= {milliseconds}]]]";
                     var elq = new EventLogQuery("Security", PathType.LogName, query);
-                    
+
                     using (var reader = new EventLogReader(elq))
                     {
                         for (var eventInstance = reader.ReadEvent(); eventInstance != null; eventInstance = reader.ReadEvent())
@@ -66,7 +66,7 @@ namespace OpenRdpGuard.Services
                 // 4625: IpAddress is usually index 19.
                 // 4624: IpAddress is usually index 18.
                 // Let's use generic XML parsing for safety.
-                
+
                 var xml = record.ToXml();
                 var doc = System.Xml.Linq.XDocument.Parse(xml);
                 var data = doc.Descendants().Where(d => d.Name.LocalName == "Data").ToList();

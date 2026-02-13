@@ -42,10 +42,38 @@
                 <Style TargetType="DataGridRow">
                     <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
                     <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource ListSelectionActiveBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource ListSelectionActiveTextBrush}" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsSelected" Value="True" />
+                                <Condition Property="Selector.IsSelectionActive" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter Property="Background" Value="{DynamicResource ListSelectionInactiveBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource ListSelectionInactiveTextBrush}" />
+                        </MultiTrigger>
+                    </Style.Triggers>
                 </Style>
                 <Style TargetType="DataGridCell">
                     <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
                     <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource ListSelectionActiveBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource ListSelectionActiveTextBrush}" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsSelected" Value="True" />
+                                <Condition Property="Selector.IsSelectionActive" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter Property="Background" Value="{DynamicResource ListSelectionInactiveBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource ListSelectionInactiveTextBrush}" />
+                        </MultiTrigger>
+                    </Style.Triggers>
                 </Style>
             </DataGrid.Resources>
             <DataGrid.Columns>
@@ -74,3 +102,4 @@
         </DataGrid>
     </Grid>
 </Page>
+

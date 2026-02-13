@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenRdpGuard.ViewModels;
 using OpenRdpGuard.Views;
@@ -34,6 +34,7 @@ namespace OpenRdpGuard
                 services.AddSingleton<IConnectionService, ConnectionService>();
                 services.AddSingleton<ISettingsService, SettingsService>();
                 services.AddSingleton<IWhitelistService, WhitelistService>();
+                services.AddSingleton<IShareService, ShareService>();
 
                 services.AddSingleton<MainWindow>();
                 services.AddSingleton<MainWindowViewModel>();
@@ -55,6 +56,9 @@ namespace OpenRdpGuard
 
                 services.AddSingleton<UsersPage>();
                 services.AddSingleton<UsersViewModel>();
+
+                services.AddSingleton<ShareManagePage>();
+                services.AddSingleton<ShareManageViewModel>();
 
                 services.AddSingleton<PortConfigPage>();
                 services.AddSingleton<PortConfigViewModel>();
@@ -260,3 +264,8 @@ namespace OpenRdpGuard
         }
     }
 }
+
+
+
+
+

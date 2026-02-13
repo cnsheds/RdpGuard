@@ -17,7 +17,7 @@
             <Border Style="{StaticResource CardBorderStyle}" HorizontalAlignment="Stretch">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                        <TextBlock Text="&#xE9D2;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0" Foreground="{DynamicResource MutedTextBrush}" />
+                        <TextBlock Text="&#xE9D2;" FontFamily="Segoe MDL2 Assets" Margin="0,0,8,0" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" />
                         <TextBlock Text="登录统计" Style="{StaticResource PageTitleTextStyle}" />
                     </StackPanel>
 

@@ -16,8 +16,13 @@
     <SolidColorBrush x:Key="ButtonBorderBrush" Color="#C7C7C7" />
     <SolidColorBrush x:Key="ButtonBackgroundHoverBrush" Color="#C4C4C4" />
     <SolidColorBrush x:Key="ButtonBackgroundPressedBrush" Color="#B8B8B8" />
+    <SolidColorBrush x:Key="ListSelectionActiveBrush" Color="#F0A140" />
+    <SolidColorBrush x:Key="ListSelectionInactiveBrush" Color="#F7D8AC" />
+    <SolidColorBrush x:Key="ListSelectionActiveTextBrush" Color="#2F1A00" />
+    <SolidColorBrush x:Key="ListSelectionInactiveTextBrush" Color="#6B460F" />
     <SolidColorBrush x:Key="TitleBarBackgroundBrush" Color="#E9E9E9" />
     <SolidColorBrush x:Key="TitleBarTextBrush" Color="#222222" />
     <SolidColorBrush x:Key="TitleBarButtonHoverBrush" Color="#E2E2E2" />
     <SolidColorBrush x:Key="TitleBarButtonPressedBrush" Color="#D6D6D6" />
 </ResourceDictionary>
+

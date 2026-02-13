@@ -34,9 +34,14 @@ namespace OpenRdpGuard.ViewModels
                 new NavigationItem { Title = "IP黑名单", IconGlyph = "\uE8C7", PageType = typeof(BlacklistPage) },
                 new NavigationItem { Title = "IP白名单", IconGlyph = "\uE8F1", PageType = typeof(WhitelistPage) },
                 new NavigationItem { Title = "用户管理", IconGlyph = "\uE77B", PageType = typeof(UsersPage) },
+                new NavigationItem { Title = "共享管理", IconGlyph = "\uE8A7", PageType = typeof(ShareManagePage) },
                 new NavigationItem { Title = "恢复默认", IconGlyph = "\uE777", PageType = typeof(RestoreDefaultsPage) },
                 new NavigationItem { Title = "主题设置", IconGlyph = "\uE790", PageType = typeof(ThemeSettingsPage) }
             };
         }
     }
 }
+
+
+
+
