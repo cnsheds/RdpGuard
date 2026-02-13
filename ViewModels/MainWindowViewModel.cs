@@ -1,7 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using System.Collections.ObjectModel;
 using OpenRdpGuard.Models;
 using OpenRdpGuard.Views.Pages;
+using System.Collections.ObjectModel;
+using System.Security.Principal;
 
 namespace OpenRdpGuard.ViewModels
 {
@@ -11,7 +12,7 @@ namespace OpenRdpGuard.ViewModels
         private string _applicationTitle = "RdpGuard - 远程桌面安全防护";
 
         [ObservableProperty]
-        private string _appVersion = "1.26.2.6";
+        private string _appVersion = "1.26.2.13";
 
         [ObservableProperty]
         private ObservableCollection<NavigationItem> _functionItems;
@@ -21,6 +22,11 @@ namespace OpenRdpGuard.ViewModels
 
         public MainWindowViewModel()
         {
+            if (IsRunningAsAdministrator())
+            {
+                ApplicationTitle += " (管理员)";
+            }
+
             _functionItems = new ObservableCollection<NavigationItem>
             {
                 new NavigationItem { Title = "当前状态", IconGlyph = "\uE9D9", PageType = typeof(DashboardPage) },
@@ -39,9 +45,24 @@ namespace OpenRdpGuard.ViewModels
                 new NavigationItem { Title = "主题设置", IconGlyph = "\uE790", PageType = typeof(ThemeSettingsPage) }
             };
         }
+
+        private static bool IsRunningAsAdministrator()
+        {
+            try
+            {
+                var identity = WindowsIdentity.GetCurrent();
+                if (identity == null)
+                {
+                    return false;
+                }
+
+                var principal = new WindowsPrincipal(identity);
+                return principal.IsInRole(WindowsBuiltInRole.Administrator);
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }
-
-
-
-
