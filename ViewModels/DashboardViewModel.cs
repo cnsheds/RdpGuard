@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using OpenRdpGuard.Services;
+using System;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using MediaBrushes = System.Windows.Media.Brushes;
@@ -39,6 +40,9 @@ namespace OpenRdpGuard.ViewModels
 
         [ObservableProperty]
         private int _blockedCount = 0;
+
+        [ObservableProperty]
+        private string _serverStartupTimeText = "未知";
 
         [ObservableProperty]
         private string _rdpServiceStatusText = "未知";
@@ -85,6 +89,11 @@ namespace OpenRdpGuard.ViewModels
             FirewallServiceStatusText = fwRunning ? "运行中" : "已停止";
             FirewallServiceStatusBrush = fwRunning ? MediaBrushes.Green : MediaBrushes.Red;
 
+            var startupTime = _systemService.GetServerStartupTime();
+            ServerStartupTimeText = startupTime.HasValue
+                ? $"{startupTime.Value:yyyy-MM-dd HH:mm:ss}（已启动 {GetUptimeText(startupTime.Value)}）"
+                : "未知";
+
             WhitelistStatusText = _whitelistService.IsWhitelistEnabled() ? "仅白名单" : "Any";
 
             var monitoringEnabled = _appSettingsService.GetBlacklistMonitoringEnabled();
@@ -115,6 +124,17 @@ namespace OpenRdpGuard.ViewModels
             {
                 BlockedCount = 0;
             }
+        }
+
+        private static string GetUptimeText(DateTime startupTime)
+        {
+            var uptime = DateTime.Now - startupTime;
+            if (uptime < TimeSpan.Zero)
+            {
+                uptime = TimeSpan.Zero;
+            }
+
+            return $"{uptime.Days} 天 {uptime.Hours} 小时";
         }
     }
 }

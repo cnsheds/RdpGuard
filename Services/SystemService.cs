@@ -1,4 +1,5 @@
 using System.ServiceProcess;
+using System.Management;
 using System.Threading.Tasks;
 
 namespace OpenRdpGuard.Services
@@ -7,6 +8,7 @@ namespace OpenRdpGuard.Services
     {
         bool IsRdpServiceRunning();
         bool IsFirewallServiceRunning();
+        DateTime? GetServerStartupTime();
         Task RestartRdpServiceAsync();
     }
 
@@ -20,6 +22,28 @@ namespace OpenRdpGuard.Services
         public bool IsFirewallServiceRunning()
         {
             return IsServiceRunning("MpsSvc");
+        }
+
+        public DateTime? GetServerStartupTime()
+        {
+            try
+            {
+                using var searcher = new ManagementObjectSearcher("SELECT LastBootUpTime FROM Win32_OperatingSystem");
+                using var results = searcher.Get();
+                foreach (ManagementObject os in results)
+                {
+                    var bootTimeValue = os["LastBootUpTime"]?.ToString();
+                    if (!string.IsNullOrWhiteSpace(bootTimeValue))
+                    {
+                        return ManagementDateTimeConverter.ToDateTime(bootTimeValue);
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            return null;
         }
 
         private bool IsServiceRunning(string serviceName)

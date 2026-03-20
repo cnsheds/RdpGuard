@@ -9,6 +9,17 @@
 
     <ScrollViewer>
         <StackPanel Margin="12">
+            <Border Style="{StaticResource CardBorderStyle}" HorizontalAlignment="Stretch" Margin="0,0,0,12">
+                <StackPanel>
+                    <TextBlock Text="服务器启动时间" Style="{StaticResource PageTitleTextStyle}" Margin="0,0,0,12" />
+
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="&#xE823;" FontFamily="Segoe MDL2 Assets" Margin="0,2,8,0" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding ServerStartupTimeText}" Foreground="{DynamicResource PrimaryTextBrush}" FontWeight="SemiBold" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
             <Border Style="{StaticResource CardBorderStyle}" HorizontalAlignment="Stretch">
                 <StackPanel>
                     <TextBlock Text="当前状态" Style="{StaticResource PageTitleTextStyle}" Margin="0,0,0,12" />
